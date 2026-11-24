@@ -50,3 +50,16 @@ END $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS plan_cells_audit ON plan_cells;
 CREATE TRIGGER plan_cells_audit AFTER INSERT OR UPDATE OR DELETE ON plan_cells
   FOR EACH ROW EXECUTE FUNCTION plan_cells_audit();
+CREATE TABLE IF NOT EXISTS plan_settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_by TEXT NOT NULL DEFAULT 'Setup',
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS plan_admin_log (
+  log_id BIGSERIAL PRIMARY KEY,
+  action TEXT NOT NULL,
+  detail TEXT NOT NULL,
+  updated_by TEXT NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

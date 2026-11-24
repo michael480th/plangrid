@@ -33,10 +33,19 @@ def init_db():
             c.execute("ALTER TABLE plan_cells ENABLE TRIGGER plan_cells_audit")
 
 
-def is_locked(scenario, period):
-    if scenario in LOCKED:
+def settings():
+    with conn() as c:
+        rows = {r["key"]: r["value"] for r in c.execute("SELECT key,value FROM plan_settings")}
+    locked = set(filter(None, rows["locked"].split(","))) if "locked" in rows else set(LOCKED)
+    lb = rows.get("lock_before", str(LOCK_BEFORE or ""))
+    return locked, (int(lb) if lb else None)
+
+
+def is_locked(scenario, period, st=None):
+    locked, lock_before = st or settings()
+    if scenario in locked:
         return f"Scenario {scenario} is read-only"
-    if LOCK_BEFORE and int(period) < LOCK_BEFORE:
+    if lock_before and int(period) < lock_before:
         return f"Period {period} is closed"
     return None
 
@@ -52,8 +61,9 @@ def list_options():
         sc = [r["scenario"] for r in c.execute("SELECT DISTINCT scenario FROM plan_cells ORDER BY 1")]
         mk = [r["market"] for r in c.execute("SELECT DISTINCT market FROM plan_cells ORDER BY 1")]
         pe = [r["period"] for r in c.execute("SELECT DISTINCT period FROM plan_cells ORDER BY 1")]
+    locked, lb = settings()
     return {"scenarios": sc, "markets": mk, "periods": pe, "measures": [DEFAULT_MEASURE],
-            "lockedScenarios": sorted(LOCKED), "lockBefore": LOCK_BEFORE, "store": "cloud database", "user": None}
+            "lockedScenarios": sorted(locked), "lockBefore": lb, "store": "cloud database", "user": None}
 
 
 def get_grid(scenario, market, compare=None, measure=DEFAULT_MEASURE):
@@ -69,13 +79,14 @@ def get_grid(scenario, market, compare=None, measure=DEFAULT_MEASURE):
         (cells if r["scenario"] == scenario else comp)[k] = r["value"]
     return {"scenario": scenario, "compare": compare, "market": market, "measure": measure,
             "periods": sorted(periods), "items": sorted(items), "cells": cells, "compareCells": comp,
-            "readOnly": scenario in LOCKED, "lockBefore": LOCK_BEFORE, "readAt": now.isoformat()}
+            "readOnly": scenario in settings()[0], "lockBefore": settings()[1], "readAt": now.isoformat()}
 
 
 def save_cells(scenario, changes, comment="", user="Plan grid", measure=DEFAULT_MEASURE):
     if not changes:
         return {"saved": 0, "conflicts": [], "locked": []}
-    locked = [{**c, "reason": is_locked(scenario, c["period"])} for c in changes if is_locked(scenario, c["period"])]
+    st = settings()
+    locked = [{**c, "reason": is_locked(scenario, c["period"], st)} for c in changes if is_locked(scenario, c["period"], st)]
     if locked:
         return {"saved": 0, "conflicts": [], "locked": locked}
     user = (user or "Plan grid")[:200]
@@ -118,6 +129,84 @@ def get_history(scenario=None, market=None, limit=20):
     return {"commits": rows}
 
 
+# ---------- admin ----------
+def _admin_log(c, action, detail, user):
+    c.execute("INSERT INTO plan_admin_log(action,detail,updated_by) VALUES (%s,%s,%s)", (action, detail[:2000], (user or "Admin")[:200]))
+
+
+def admin_overview():
+    locked, lb = settings()
+    with conn() as c:
+        sc = c.execute("SELECT scenario, count(*) AS cells, coalesce(sum(value),0) AS total, count(DISTINCT market) AS markets, "
+                       "min(period) AS first_period, max(period) AS last_period, max(updated_at) AS last_change FROM plan_cells GROUP BY scenario ORDER BY scenario").fetchall()
+        stats = c.execute("SELECT (SELECT count(*) FROM plan_commits) AS saves, (SELECT count(*) FROM plan_log) AS cell_changes").fetchone()
+        alog = c.execute("SELECT action,detail,updated_by,updated_at FROM plan_admin_log ORDER BY log_id DESC LIMIT 20").fetchall()
+    for r in sc:
+        r["locked"] = r["scenario"] in locked
+        r["last_change"] = r["last_change"].isoformat() if r["last_change"] else None
+    for r in alog:
+        r["updated_at"] = r["updated_at"].isoformat()
+    return {"scenarios": sc, "lockBefore": lb, "saves": stats["saves"], "cellChanges": stats["cell_changes"], "adminLog": alog}
+
+
+def set_locks(locked_scenarios, lock_before=None, user="Admin"):
+    locked = sorted({x.strip() for x in locked_scenarios if x and x.strip()})
+    lb = str(int(lock_before)) if lock_before else ""
+    with conn() as c:
+        for k, v in (("locked", ",".join(locked)), ("lock_before", lb)):
+            c.execute("INSERT INTO plan_settings(key,value,updated_by) VALUES (%s,%s,%s) ON CONFLICT (key) DO UPDATE "
+                      "SET value=EXCLUDED.value, updated_by=EXCLUDED.updated_by, updated_at=now()", (k, v, user))
+        _admin_log(c, "Locks changed", f"Read-only: {', '.join(locked) or 'none'}. Closed before: {lb or 'none'}", user)
+    return {"lockedScenarios": locked, "lockBefore": int(lb) if lb else None}
+
+
+def copy_scenario(source, target, comment="", user="Admin"):
+    target = (target or "").strip()
+    if not target or target == source:
+        return {"copied": 0, "error": "Give the new version a name different from the source"}
+    with conn() as c:
+        if c.execute("SELECT 1 FROM plan_cells WHERE scenario=%s LIMIT 1", (target,)).fetchone():
+            return {"copied": 0, "error": f"A version called {target} already exists"}
+        n = c.execute("SELECT count(*) AS n FROM plan_cells WHERE scenario=%s", (source,)).fetchone()["n"]
+        if not n:
+            return {"copied": 0, "error": f"No version called {source}"}
+        cid = c.execute("INSERT INTO plan_commits(scenario,markets,cell_count,net_change,comment,updated_by) "
+                        "SELECT %s,'ALL',count(*),coalesce(sum(value),0),%s,%s FROM plan_cells WHERE scenario=%s RETURNING commit_id",
+                        (target, (comment or f"Copied from {source}")[:1000], user, source)).fetchone()["commit_id"]
+        c.execute("INSERT INTO plan_cells(scenario,measure,market,item,period,value,commit_id,updated_by) "
+                  "SELECT %s,measure,market,item,period,value,%s,%s FROM plan_cells WHERE scenario=%s", (target, cid, user, source))
+        _admin_log(c, "Version copied", f"{source} to {target}, {n} cells", user)
+    return {"copied": n, "commitId": cid, "target": target}
+
+
+def get_commit(commit_id, limit=500):
+    with conn() as c:
+        head = c.execute("SELECT commit_id,scenario,markets,cell_count,net_change,comment,updated_by,updated_at FROM plan_commits WHERE commit_id=%s", (commit_id,)).fetchone()
+        if not head:
+            return {"error": "No such save"}
+        rows = c.execute("SELECT market,item,period,old_value,new_value,updated_by,updated_at FROM plan_log WHERE commit_id=%s ORDER BY market,item,period LIMIT %s",
+                         (commit_id, max(1, min(int(limit), 5000)))).fetchall()
+    head["updated_at"] = head["updated_at"].isoformat()
+    for r in rows:
+        r["updated_at"] = r["updated_at"].isoformat()
+    return {"commit": head, "changes": rows, "truncated": len(rows) >= limit}
+
+
+def revert_commit(commit_id, user="Admin"):
+    """Puts back the old values of one save, as a new save. Refuses if any of those cells changed since."""
+    with conn() as c:
+        head = c.execute("SELECT scenario FROM plan_commits WHERE commit_id=%s", (commit_id,)).fetchone()
+        rows = c.execute("SELECT market,item,period,measure,old_value,new_value FROM plan_log WHERE commit_id=%s", (commit_id,)).fetchall()
+    if not head or not rows:
+        return {"saved": 0, "error": "Nothing to reverse: this save has no cell-level history (the initial load and copies cannot be reversed)"}
+    changes = [{"market": r["market"], "item": r["item"], "period": r["period"], "value": r["old_value"], "expected": r["new_value"]} for r in rows]
+    res = save_cells(head["scenario"], changes, f"Reversal of save {commit_id}", user, rows[0]["measure"])
+    if res.get("saved"):
+        with conn() as c:
+            _admin_log(c, "Save reversed", f"Save {commit_id}, {res['saved']} cells, new save {res['commitId']}", user)
+    return res
+
+
 def build_server(**kw):
     from mcp.server.fastmcp import FastMCP
     from mcp.types import ToolAnnotations
@@ -139,4 +228,20 @@ def build_server(**kw):
     @mcp.tool(name="get_history", annotations=ro, description="Recent commits, newest first: who, when, comment, cells, net change.")
     def _d(scenario: str | None = None, market: str | None = None, limit: int = 20) -> dict:
         return get_history(scenario, market, limit)
+    @mcp.tool(name="admin_overview", annotations=ro, description="Admin view: each version with cells, total, markets, lock status; closed-period setting; counts; recent admin actions.")
+    def _e() -> dict: return admin_overview()
+
+    @mcp.tool(name="set_locks", annotations=rw, description="Set which versions are read-only and the first open month (DateIntKey, e.g. 20260301). Replaces the current settings.")
+    def _f(locked_scenarios: list[str], lock_before: int | None = None, user: str = "Admin") -> dict:
+        return set_locks(locked_scenarios, lock_before, user)
+
+    @mcp.tool(name="copy_scenario", annotations=rw, description="Copy every cell of one version into a new version name. Refuses if the target exists.")
+    def _g(source: str, target: str, comment: str = "", user: str = "Admin") -> dict:
+        return copy_scenario(source, target, comment, user)
+
+    @mcp.tool(name="get_commit", annotations=ro, description="One save with every cell change: market, item, period, old value, new value.")
+    def _h(commit_id: int, limit: int = 500) -> dict: return get_commit(commit_id, limit)
+
+    @mcp.tool(name="revert_commit", annotations=rw, description="Reverse one save by writing back its old values as a new save. Refuses if any of those cells changed since.")
+    def _i(commit_id: int, user: str = "Admin") -> dict: return revert_commit(commit_id, user)
     return mcp
