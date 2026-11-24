@@ -1,0 +1,748 @@
+{
+"markets": [
+{
+"market": "AK",
+"region": "West North",
+"business_unit": "West",
+"regional_manager": "Angela Martin",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "AL",
+"region": "Control East",
+"business_unit": "Control",
+"regional_manager": "Pam Beesly",
+"bu_manager": "Michael Scott",
+"channel": "control"
+},
+{
+"market": "AR",
+"region": "Central South",
+"business_unit": "East",
+"regional_manager": "Kelly Kapoor",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "AZ",
+"region": "West South",
+"business_unit": "West",
+"regional_manager": "Stanley Hudson",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "CA",
+"region": "West South",
+"business_unit": "West",
+"regional_manager": "Kelly Kapoor",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "CO",
+"region": "Central South",
+"business_unit": "West",
+"regional_manager": "Michael Parrott",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "CT",
+"region": "East North",
+"business_unit": "East",
+"regional_manager": "Toby Flenderson",
+"bu_manager": "Jim Halpert",
+"channel": "open"
+},
+{
+"market": "DE",
+"region": "East North",
+"business_unit": "East",
+"regional_manager": "Toby Flenderson",
+"bu_manager": "Jim Halpert",
+"channel": "open"
+},
+{
+"market": "FL",
+"region": "East South",
+"business_unit": "East",
+"regional_manager": "Creed Bratton",
+"bu_manager": "Jim Halpert",
+"channel": "open"
+},
+{
+"market": "GA",
+"region": "East South",
+"business_unit": "East",
+"regional_manager": "Creed Bratton",
+"bu_manager": "Jim Halpert",
+"channel": "open"
+},
+{
+"market": "HI",
+"region": "West South",
+"business_unit": "West",
+"regional_manager": "Stanley Hudson",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "IA",
+"region": "Control West",
+"business_unit": "Control",
+"regional_manager": "Oscar Martinez",
+"bu_manager": "Michael Scott",
+"channel": "control"
+},
+{
+"market": "ID",
+"region": "Control West",
+"business_unit": "Control",
+"regional_manager": "Oscar Martinez",
+"bu_manager": "Michael Scott",
+"channel": "control"
+},
+{
+"market": "IL",
+"region": "Central North",
+"business_unit": "West",
+"regional_manager": "Andy Bernard",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "IN",
+"region": "Central North",
+"business_unit": "West",
+"regional_manager": "Andy Bernard",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "KS",
+"region": "Central South",
+"business_unit": "West",
+"regional_manager": "Kelly Kapoor",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "KY",
+"region": "East South",
+"business_unit": "East",
+"regional_manager": "Creed Bratton",
+"bu_manager": "Jim Halpert",
+"channel": "open"
+},
+{
+"market": "LA",
+"region": "Central South",
+"business_unit": "West",
+"regional_manager": "Kelly Kapoor",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "MA",
+"region": "East North",
+"business_unit": "East",
+"regional_manager": "Toby Flenderson",
+"bu_manager": "Jim Halpert",
+"channel": "open"
+},
+{
+"market": "MD",
+"region": "East North",
+"business_unit": "East",
+"regional_manager": "Toby Flenderson",
+"bu_manager": "Jim Halpert",
+"channel": "open"
+},
+{
+"market": "ME",
+"region": "Control East",
+"business_unit": "Control",
+"regional_manager": "Pam Beesly",
+"bu_manager": "Michael Scott",
+"channel": "control"
+},
+{
+"market": "MI",
+"region": "Control West",
+"business_unit": "Control",
+"regional_manager": "Oscar Martinez",
+"bu_manager": "Michael Scott",
+"channel": "control"
+},
+{
+"market": "MN",
+"region": "Central North",
+"business_unit": "West",
+"regional_manager": "Andy Bernard",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "MO",
+"region": "Central South",
+"business_unit": "West",
+"regional_manager": "Kelly Kapoor",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "MS",
+"region": "Control East",
+"business_unit": "Control",
+"regional_manager": "Pam Beesly",
+"bu_manager": "Michael Scott",
+"channel": "control"
+},
+{
+"market": "MT",
+"region": "Control West",
+"business_unit": "Control",
+"regional_manager": "Oscar Martinez",
+"bu_manager": "Michael Scott",
+"channel": "control"
+},
+{
+"market": "NC",
+"region": "Control East",
+"business_unit": "Control",
+"regional_manager": "Pam Beesly",
+"bu_manager": "Michael Scott",
+"channel": "control"
+},
+{
+"market": "ND",
+"region": "Central North",
+"business_unit": "West",
+"regional_manager": "Andy Bernard",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "NE",
+"region": "Central North",
+"business_unit": "West",
+"regional_manager": "Andy Bernard",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "NH",
+"region": "Control East",
+"business_unit": "Control",
+"regional_manager": "Pam Beesly",
+"bu_manager": "Michael Scott",
+"channel": "control"
+},
+{
+"market": "NJ",
+"region": "East North",
+"business_unit": "East",
+"regional_manager": "Toby Flenderson",
+"bu_manager": "Jim Halpert",
+"channel": "open"
+},
+{
+"market": "NM",
+"region": "West South",
+"business_unit": "West",
+"regional_manager": "Stanley Hudson",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "NV",
+"region": "West North",
+"business_unit": "West",
+"regional_manager": "Angela Martin",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "NY",
+"region": "East North",
+"business_unit": "East",
+"regional_manager": "Toby Flenderson",
+"bu_manager": "Jim Halpert",
+"channel": "open"
+},
+{
+"market": "OH",
+"region": "Control West",
+"business_unit": "Control",
+"regional_manager": "Oscar Martinez",
+"bu_manager": "Michael Scott",
+"channel": "control"
+},
+{
+"market": "OK",
+"region": "Central South",
+"business_unit": "West",
+"regional_manager": "Kelly Kapoor",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "OR",
+"region": "Control West",
+"business_unit": "Control",
+"regional_manager": "Oscar Martinez",
+"bu_manager": "Michael Scott",
+"channel": "control"
+},
+{
+"market": "PA",
+"region": "Control East",
+"business_unit": "Control",
+"regional_manager": "Pam Beesly",
+"bu_manager": "Michael Scott",
+"channel": "control"
+},
+{
+"market": "RI",
+"region": "East North",
+"business_unit": "East",
+"regional_manager": "Toby Flenderson",
+"bu_manager": "Jim Halpert",
+"channel": "open"
+},
+{
+"market": "SC",
+"region": "East South",
+"business_unit": "East",
+"regional_manager": "Creed Bratton",
+"bu_manager": "Jim Halpert",
+"channel": "open"
+},
+{
+"market": "SD",
+"region": "Central North",
+"business_unit": "West",
+"regional_manager": "Andy Bernard",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "TN",
+"region": "East South",
+"business_unit": "East",
+"regional_manager": "Creed Bratton",
+"bu_manager": "Jim Halpert",
+"channel": "open"
+},
+{
+"market": "TX",
+"region": "Central South",
+"business_unit": "West",
+"regional_manager": "Kelly Kapoor",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "UT",
+"region": "Control West",
+"business_unit": "Control",
+"regional_manager": "Oscar Martinez",
+"bu_manager": "Michael Scott",
+"channel": "control"
+},
+{
+"market": "VA",
+"region": "Control East",
+"business_unit": "Control",
+"regional_manager": "Pam Beesly",
+"bu_manager": "Michael Scott",
+"channel": "control"
+},
+{
+"market": "VT",
+"region": "Control East",
+"business_unit": "Control",
+"regional_manager": "Pam Beesly",
+"bu_manager": "Michael Scott",
+"channel": "control"
+},
+{
+"market": "WA",
+"region": "West North",
+"business_unit": "West",
+"regional_manager": "Angela Martin",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "WI",
+"region": "Central North",
+"business_unit": "West",
+"regional_manager": "Andy Bernard",
+"bu_manager": "Dwight Schrute",
+"channel": "open"
+},
+{
+"market": "WV",
+"region": "Control East",
+"business_unit": "Control",
+"regional_manager": "Pam Beesly",
+"bu_manager": "Michael Scott",
+"channel": "control"
+},
+{
+"market": "WY",
+"region": "Control West",
+"business_unit": "Control",
+"regional_manager": "Oscar Martinez",
+"bu_manager": "Michael Scott",
+"channel": "control"
+}
+],
+"comments": [
+{
+"scenario": "Forecast",
+"market": "TX",
+"text": "yDrinks released reduced Nov/Dec expectations due to UT football underperformance",
+"at": "2025-10-29T17:21:37.783"
+},
+{
+"scenario": "Forecast",
+"market": "NY",
+"text": "statewide boost from Knicks promotion\n\n\u200b",
+"at": "2026-03-18T17:26:25.707"
+},
+{
+"scenario": "Forecast",
+"market": "WI",
+"text": "closed deals in may and dec up 5% on the year",
+"at": "2026-03-18T19:57:07.69"
+},
+{
+"scenario": "Forecast",
+"market": "IN",
+"text": "deal closed in May, projected to be up 6% YoY",
+"at": "2026-03-18T20:19:55.403"
+},
+{
+"scenario": "Forecast",
+"market": "OR",
+"text": "fcst up 2% YoY",
+"at": "2026-03-18T21:50:07.457"
+},
+{
+"scenario": "Forecast",
+"market": "IL",
+"text": "**Depletions expected to soften in Q1 due to elevated distributor inventory after strong holiday sell-in. Planning conservative shipments through March and monitoring weeks-on-hand closely.**\n\nApplied LY actuals + 5%",
+"at": "2026-03-19T16:22:31.333"
+},
+{
+"scenario": "Agent 2+10",
+"market": "AK",
+"text": "Agent 2026: 1,469 cases vs Aimplan Forecast 1,678 (-12.5%). Built from 2025 same month x trend +3.3% (2025 vs 2024 +4.2%, Jan-Feb 2026 +0.5%). Review: Aimplan Mar-Dec is +35% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "AL",
+"text": "Agent 2026: 7,335 cases vs Aimplan Forecast 8,623 (-14.9%). Built from 2025 same month x trend -0.8% (2025 vs 2024 -1.2%, Jan-Feb 2026 +0.3%). Review: Aimplan Mar-Dec is +22% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "AR",
+"text": "Agent 2026: 2,937 cases vs Aimplan Forecast 3,470 (-15.3%). Built from 2025 same month x trend +0.2% (2025 vs 2024 +0.5%, Jan-Feb 2026 -0.8%). Review: Aimplan Mar-Dec is +29% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "AZ",
+"text": "Agent 2026: 16,814 cases vs Aimplan Forecast 18,790 (-10.5%). Built from 2025 same month x trend +5.9% (2025 vs 2024 +8.1%, Jan-Feb 2026 -0.6%). Review: Aimplan Mar-Dec is +21% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "CA",
+"text": "Agent 2026: 73,575 cases vs Aimplan Forecast 80,261 (-8.3%). Built from 2025 same month x trend +8.4% (2025 vs 2024 +11.0%, Jan-Feb 2026 +0.4%). Review: Aimplan Mar-Dec is +19% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "CO",
+"text": "Agent 2026: 5,256 cases vs Aimplan Forecast 6,160 (-14.7%). Built from 2025 same month x trend -2.0% (2025 vs 2024 -2.3%, Jan-Feb 2026 -1.1%). Review: Aimplan Mar-Dec is +24% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "CT",
+"text": "Agent 2026: 1,905 cases vs Aimplan Forecast 2,268 (-16.0%). Built from 2025 same month x trend -3.1% (2025 vs 2024 -4.3%, Jan-Feb 2026 +0.3%). Review: Aimplan Mar-Dec is +34% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "DE",
+"text": "Agent 2026: 2,457 cases vs Aimplan Forecast 2,936 (-16.3%). Built from 2025 same month x trend -2.2% (2025 vs 2024 -3.1%, Jan-Feb 2026 +0.5%). Review: Aimplan Mar-Dec is +29% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "FL",
+"text": "Agent 2026: 18,893 cases vs Aimplan Forecast 21,818 (-13.4%). Built from 2025 same month x trend +1.9% (2025 vs 2024 +2.1%, Jan-Feb 2026 +1.4%). Review: Aimplan Mar-Dec is +22% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "GA",
+"text": "Agent 2026: 11,195 cases vs Aimplan Forecast 13,189 (-15.1%). Built from 2025 same month x trend -1.6% (2025 vs 2024 -2.2%, Jan-Feb 2026 +0.0%). Review: Aimplan Mar-Dec is +22% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "HI",
+"text": "Agent 2026: 2,092 cases vs Aimplan Forecast 2,412 (-13.3%). Built from 2025 same month x trend +2.8% (2025 vs 2024 +3.3%, Jan-Feb 2026 +1.5%). Review: Aimplan Mar-Dec is +34% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "IA",
+"text": "Agent 2026: 6,432 cases vs Aimplan Forecast 7,226 (-11.0%). Built from 2025 same month x trend +4.5% (2025 vs 2024 +5.8%, Jan-Feb 2026 +0.4%). Review: Aimplan Mar-Dec is +23% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "ID",
+"text": "Agent 2026: 3,746 cases vs Aimplan Forecast 4,449 (-15.8%). Built from 2025 same month x trend -2.1% (2025 vs 2024 -2.9%, Jan-Feb 2026 +0.5%). Review: Aimplan Mar-Dec is +26% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "IL",
+"text": "Agent 2026: 8,660 cases vs Aimplan Forecast 8,837 (-2.0%). Built from 2025 same month x trend +3.6% (2025 vs 2024 +4.6%, Jan-Feb 2026 +0.8%). Planner input applied: \"Depletions expected to soften in Q1 due to elevated distributor inventory\" (March held flat to LY); \"Applied LY actuals + 5%\" (+5% vs LY applied Apr-Dec).",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "IN",
+"text": "Agent 2026: 15,612 cases vs Aimplan Forecast 17,546 (-11.0%). Built from 2025 same month x trend -3.5% (2025 vs 2024 -4.9%, Jan-Feb 2026 +0.7%). Planner input applied: \"deal closed in May, projected to be up 6% YoY\" (+6% vs LY applied May-Dec).",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "KS",
+"text": "Agent 2026: 1,913 cases vs Aimplan Forecast 2,214 (-13.6%). Built from 2025 same month x trend +1.9% (2025 vs 2024 +2.8%, Jan-Feb 2026 -0.8%). Review: Aimplan Mar-Dec is +34% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "KY",
+"text": "Agent 2026: 4,510 cases vs Aimplan Forecast 4,960 (-9.1%). Built from 2025 same month x trend +7.8% (2025 vs 2024 +10.3%, Jan-Feb 2026 +0.0%). Review: Aimplan Mar-Dec is +27% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "LA",
+"text": "Agent 2026: 3,326 cases vs Aimplan Forecast 3,737 (-11.0%). Built from 2025 same month x trend +6.0% (2025 vs 2024 +8.1%, Jan-Feb 2026 -0.3%). Review: Aimplan Mar-Dec is +28% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "MA",
+"text": "Agent 2026: 3,911 cases vs Aimplan Forecast 4,473 (-12.6%). Built from 2025 same month x trend +3.6% (2025 vs 2024 +4.4%, Jan-Feb 2026 +0.9%). Review: Aimplan Mar-Dec is +26% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "MD",
+"text": "Agent 2026: 3,828 cases vs Aimplan Forecast 4,427 (-13.5%). Built from 2025 same month x trend -0.4% (2025 vs 2024 -0.4%, Jan-Feb 2026 -0.4%). Review: Aimplan Mar-Dec is +25% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "ME",
+"text": "Agent 2026: 2,833 cases vs Aimplan Forecast 3,335 (-15.1%). Built from 2025 same month x trend -1.0% (2025 vs 2024 -1.4%, Jan-Feb 2026 +0.2%). Review: Aimplan Mar-Dec is +27% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "MI",
+"text": "Agent 2026: 7,796 cases vs Aimplan Forecast 8,975 (-13.1%). Built from 2025 same month x trend +1.5% (2025 vs 2024 +1.7%, Jan-Feb 2026 +0.6%). Review: Aimplan Mar-Dec is +21% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "MN",
+"text": "Agent 2026: 17,729 cases vs Aimplan Forecast 20,349 (-12.9%). Built from 2025 same month x trend -0.9% (2025 vs 2024 -1.4%, Jan-Feb 2026 +0.5%). Review: Aimplan Mar-Dec is +20% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "MO",
+"text": "Agent 2026: 1,940 cases vs Aimplan Forecast 1,915 (+1.3%). Built from 2025 same month x trend +6.7% (2025 vs 2024 +9.5%, Jan-Feb 2026 -1.8%). Review: Aimplan Mar-Dec is +21% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "MS",
+"text": "Agent 2026: 2,985 cases vs Aimplan Forecast 3,517 (-15.1%). Built from 2025 same month x trend -0.8% (2025 vs 2024 -1.1%, Jan-Feb 2026 +0.3%). Review: Aimplan Mar-Dec is +28% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "MT",
+"text": "Agent 2026: 4,210 cases vs Aimplan Forecast 4,942 (-14.8%). Built from 2025 same month x trend -0.1% (2025 vs 2024 -0.1%, Jan-Feb 2026 -0.3%). Review: Aimplan Mar-Dec is +26% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "NC",
+"text": "Agent 2026: 66,195 cases vs Aimplan Forecast 73,324 (-9.7%). Built from 2025 same month x trend +6.4% (2025 vs 2024 +8.4%, Jan-Feb 2026 +0.3%). Noted but not applied: \"bourbon increase in May\" (no size given). Add a % to include it. Review: Aimplan Mar-Dec is +20% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "ND",
+"text": "Agent 2026: 1,326 cases vs Aimplan Forecast 1,563 (-15.2%). Built from 2025 same month x trend +0.4% (2025 vs 2024 +0.4%, Jan-Feb 2026 +0.6%). Review: Aimplan Mar-Dec is +39% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "NE",
+"text": "Agent 2026: 2,012 cases vs Aimplan Forecast 2,370 (-15.1%). Built from 2025 same month x trend -0.4% (2025 vs 2024 -0.8%, Jan-Feb 2026 +0.7%). Review: Aimplan Mar-Dec is +33% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "NH",
+"text": "Agent 2026: 6,110 cases vs Aimplan Forecast 7,234 (-15.5%). Built from 2025 same month x trend -2.7% (2025 vs 2024 -3.6%, Jan-Feb 2026 -0.1%). Review: Aimplan Mar-Dec is +24% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "NJ",
+"text": "Agent 2026: 3,477 cases vs Aimplan Forecast 4,045 (-14.1%). Built from 2025 same month x trend +1.2% (2025 vs 2024 +1.7%, Jan-Feb 2026 -0.0%). Review: Aimplan Mar-Dec is +25% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "NM",
+"text": "Agent 2026: 1,560 cases vs Aimplan Forecast 1,855 (-15.9%). Built from 2025 same month x trend +0.3% (2025 vs 2024 +0.3%, Jan-Feb 2026 +0.6%). Review: Aimplan Mar-Dec is +37% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "NV",
+"text": "Agent 2026: 10,526 cases vs Aimplan Forecast 11,758 (-10.5%). Built from 2025 same month x trend +7.0% (2025 vs 2024 +8.9%, Jan-Feb 2026 +1.1%). Review: Aimplan Mar-Dec is +23% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "NY",
+"text": "Agent 2026: 8,386 cases vs Aimplan Forecast 9,920 (-15.5%). Built from 2025 same month x trend -0.6% (2025 vs 2024 -0.8%, Jan-Feb 2026 -0.2%). Noted but not applied: \"statewide boost from Knicks promotion\" (no size or timing given). Add a % to include it. Review: Aimplan Mar-Dec is +22% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "OH",
+"text": "Agent 2026: 42,907 cases vs Aimplan Forecast 47,656 (-10.0%). Built from 2025 same month x trend +5.7% (2025 vs 2024 +7.5%, Jan-Feb 2026 +0.3%). Review: Aimplan Mar-Dec is +20% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "OK",
+"text": "Agent 2026: 1,351 cases vs Aimplan Forecast 1,564 (-13.6%). Built from 2025 same month x trend +2.3% (2025 vs 2024 +3.2%, Jan-Feb 2026 -0.4%). Review: Aimplan Mar-Dec is +40% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "OR",
+"text": "Agent 2026: 11,621 cases vs Aimplan Forecast 13,315 (-12.7%). Built from 2025 same month x trend +2.0% (2025 vs 2024 +2.5%, Jan-Feb 2026 +0.4%). Planner input applied: \"fcst up 2% YoY\" (+2% vs LY applied Mar-Dec).",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "PA",
+"text": "Agent 2026: 11,836 cases vs Aimplan Forecast 12,908 (-8.3%). Built from 2025 same month x trend +7.9% (2025 vs 2024 +10.5%, Jan-Feb 2026 -0.0%). Review: Aimplan Mar-Dec is +21% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "RI",
+"text": "Agent 2026: 1,270 cases vs Aimplan Forecast 1,423 (-10.7%). Built from 2025 same month x trend +7.0% (2025 vs 2024 +9.4%, Jan-Feb 2026 -0.1%). Review: Aimplan Mar-Dec is +41% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "SC",
+"text": "Agent 2026: 11,707 cases vs Aimplan Forecast 13,757 (-14.9%). Built from 2025 same month x trend -2.4% (2025 vs 2024 -2.8%, Jan-Feb 2026 -1.2%). Review: Aimplan Mar-Dec is +22% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "SD",
+"text": "Agent 2026: 1,215 cases vs Aimplan Forecast 1,404 (-13.4%). Built from 2025 same month x trend -0.2% (2025 vs 2024 -0.7%, Jan-Feb 2026 +1.5%). Review: Aimplan Mar-Dec is +42% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "TN",
+"text": "Agent 2026: 5,746 cases vs Aimplan Forecast 6,698 (-14.2%). Built from 2025 same month x trend -1.3% (2025 vs 2024 -1.8%, Jan-Feb 2026 +0.0%). Review: Aimplan Mar-Dec is +23% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "TX",
+"text": "Agent 2026: 29,701 cases vs Aimplan Forecast 32,565 (-8.8%). Built from 2025 same month x trend +7.4% (2025 vs 2024 +10.0%, Jan-Feb 2026 -0.6%). Noted but not applied: \"yDrinks released reduced Nov/Dec expectations due to UT football underperformance\" (no size given). Add a % to include it. Review: Aimplan Mar-Dec is +20% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "UT",
+"text": "Agent 2026: 9,956 cases vs Aimplan Forecast 11,244 (-11.5%). Built from 2025 same month x trend +3.7% (2025 vs 2024 +4.9%, Jan-Feb 2026 +0.4%). Review: Aimplan Mar-Dec is +21% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "VA",
+"text": "Agent 2026: 8,972 cases vs Aimplan Forecast 10,414 (-13.8%). Built from 2025 same month x trend +1.0% (2025 vs 2024 +1.2%, Jan-Feb 2026 +0.5%). Review: Aimplan Mar-Dec is +21% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "VT",
+"text": "Agent 2026: 1,409 cases vs Aimplan Forecast 1,573 (-10.4%). Built from 2025 same month x trend +6.6% (2025 vs 2024 +8.7%, Jan-Feb 2026 +0.5%). Review: Aimplan Mar-Dec is +41% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "WA",
+"text": "Agent 2026: 13,549 cases vs Aimplan Forecast 16,018 (-15.4%). Built from 2025 same month x trend -0.3% (2025 vs 2024 +0.1%, Jan-Feb 2026 -1.6%). Review: Aimplan Mar-Dec is +21% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "WI",
+"text": "Agent 2026: 4,918 cases vs Aimplan Forecast 5,485 (-10.3%). Built from 2025 same month x trend +3.9% (2025 vs 2024 +5.6%, Jan-Feb 2026 -1.2%). Planner input applied: \"closed deals in may and dec up 5% on the year\" (Read as +5% for the year. Applied Mar-Dec).",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "WV",
+"text": "Agent 2026: 3,375 cases vs Aimplan Forecast 3,882 (-13.1%). Built from 2025 same month x trend -0.5% (2025 vs 2024 -0.8%, Jan-Feb 2026 +0.4%). Review: Aimplan Mar-Dec is +22% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Agent 2+10",
+"market": "WY",
+"text": "Agent 2026: 2,155 cases vs Aimplan Forecast 2,593 (-16.9%). Built from 2025 same month x trend -2.8% (2025 vs 2024 -3.9%, Jan-Feb 2026 +0.4%). Review: Aimplan Mar-Dec is +32% vs LY with no stated driver.",
+"at": "2026-11-18T19:16:34.363"
+},
+{
+"scenario": "Forecast",
+"market": "NC",
+"text": "bourbon increase in May",
+"at": "2026-11-24T06:22:57.633"
+}
+]
+}

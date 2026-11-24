@@ -1,6 +1,6 @@
 import os
 from mcp.server.transport_security import TransportSecuritySettings
-from mailroom import build_server, init_db
+from planning import build_server, init_db
 
 init_db()
 SECRET = os.environ["PLANGRID_SECRET"]

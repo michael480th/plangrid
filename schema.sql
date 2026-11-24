@@ -1,4 +1,4 @@
--- PlanGrid filing cabinet. Every change to plan_cells is copied to plan_log by a trigger,
+-- PlanGrid database. Every change to plan_cells is copied to plan_log by a trigger,
 -- so the history is kept even if something writes to the table directly.
 CREATE TABLE IF NOT EXISTS plan_commits (
   commit_id   BIGSERIAL PRIMARY KEY,
@@ -37,8 +37,7 @@ CREATE OR REPLACE FUNCTION plan_cells_audit() RETURNS trigger AS $$
 BEGIN
   IF TG_OP = 'DELETE' THEN
     INSERT INTO plan_log(commit_id,scenario,measure,market,item,period,old_value,new_value,updated_by)
-    VALUES (OLD.commit_id,OLD.scenario,OLD.measure,OLD.market,OLD.item,OLD.period,OLD.value,NULL,
-            coalesce(current_setting('plangrid.user', true), session_user));
+    VALUES (OLD.commit_id,OLD.scenario,OLD.measure,OLD.market,OLD.item,OLD.period,OLD.value,NULL,session_user);
     RETURN OLD;
   END IF;
   IF TG_OP = 'UPDATE' AND NEW.value IS NOT DISTINCT FROM OLD.value THEN RETURN NEW; END IF;
@@ -50,16 +49,30 @@ END $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS plan_cells_audit ON plan_cells;
 CREATE TRIGGER plan_cells_audit AFTER INSERT OR UPDATE OR DELETE ON plan_cells
   FOR EACH ROW EXECUTE FUNCTION plan_cells_audit();
+
 CREATE TABLE IF NOT EXISTS plan_settings (
-  key TEXT PRIMARY KEY,
-  value TEXT NOT NULL,
-  updated_by TEXT NOT NULL DEFAULT 'Setup',
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+  key TEXT PRIMARY KEY, value TEXT NOT NULL,
+  updated_by TEXT NOT NULL DEFAULT 'Setup', updated_at TIMESTAMPTZ NOT NULL DEFAULT now());
 CREATE TABLE IF NOT EXISTS plan_admin_log (
-  log_id BIGSERIAL PRIMARY KEY,
-  action TEXT NOT NULL,
-  detail TEXT NOT NULL,
-  updated_by TEXT NOT NULL,
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+  log_id BIGSERIAL PRIMARY KEY, action TEXT NOT NULL, detail TEXT NOT NULL,
+  updated_by TEXT NOT NULL, updated_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS plan_scenarios (
+  scenario TEXT PRIMARY KEY, status TEXT NOT NULL DEFAULT 'Open', kind TEXT NOT NULL DEFAULT 'Plan',
+  description TEXT NOT NULL DEFAULT '', sort INT NOT NULL DEFAULT 100,
+  updated_by TEXT NOT NULL DEFAULT 'Setup', updated_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS plan_markets (
+  market TEXT PRIMARY KEY, region TEXT, business_unit TEXT, regional_manager TEXT, bu_manager TEXT, channel TEXT);
+CREATE TABLE IF NOT EXISTS plan_users (
+  user_id SERIAL PRIMARY KEY, name TEXT NOT NULL UNIQUE, role TEXT NOT NULL, markets TEXT NOT NULL DEFAULT '',
+  active BOOLEAN NOT NULL DEFAULT true, updated_by TEXT NOT NULL DEFAULT 'Setup', updated_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS plan_status (
+  scenario TEXT NOT NULL, market TEXT NOT NULL, status INT NOT NULL DEFAULT 10,
+  updated_by TEXT NOT NULL DEFAULT 'Setup', updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (scenario, market));
+CREATE TABLE IF NOT EXISTS plan_status_log (
+  log_id BIGSERIAL PRIMARY KEY, scenario TEXT, market TEXT, old_status INT, new_status INT,
+  action TEXT, note TEXT, updated_by TEXT, updated_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS plan_comments (
+  comment_id BIGSERIAL PRIMARY KEY, scenario TEXT NOT NULL, market TEXT NOT NULL, author TEXT NOT NULL,
+  role TEXT NOT NULL, kind TEXT NOT NULL DEFAULT 'note', text TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE INDEX IF NOT EXISTS plan_comments_mkt ON plan_comments(scenario, market);
