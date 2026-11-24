@@ -25,11 +25,12 @@ def init_db():
             import gzip
             cid = c.execute("INSERT INTO plan_commits(scenario,markets,cell_count,net_change,comment,updated_by) "
                             "VALUES ('Forecast,Agent 2+10,Plan,Actuals','ALL',0,0,'Seed: depletion demo data loaded from Aimplan model, Nov 20 2026','Setup') RETURNING commit_id").fetchone()["commit_id"]
-            c.execute("SET LOCAL session_replication_role = replica")  # skip per-row audit for the initial load
+            c.execute("ALTER TABLE plan_cells DISABLE TRIGGER plan_cells_audit")  # skip per-row audit for the initial load
             with c.cursor().copy("COPY plan_cells(scenario,measure,market,item,period,value) FROM STDIN WITH (FORMAT csv, HEADER true)") as cp:
                 cp.write(gzip.open(seed, "rb").read())
             n = c.execute("UPDATE plan_cells SET commit_id=%s, updated_by='Setup' WHERE commit_id IS NULL", (cid,)).rowcount
             c.execute("UPDATE plan_commits SET cell_count=%s, net_change=(SELECT coalesce(sum(value),0) FROM plan_cells) WHERE commit_id=%s", (n, cid))
+            c.execute("ALTER TABLE plan_cells ENABLE TRIGGER plan_cells_audit")
 
 
 def is_locked(scenario, period):
