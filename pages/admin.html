@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PlanGrid Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: an administration portal, plain and dependable, like the Aimplan portal it mirrors.
+   IDEA: a left-hand module list and one table per module, with edit in place.
+   PICTURE: the module's table, at the top, under a short title and its toolbar.
+   COLOUR and TYPE: white, ink, a deep slate bar for the header, green for open, red only for destructive actions. Inter throughout.
+   LAYOUT: header bar, sidebar of modules, content area with toolbar and table. */
+:root{color-scheme:light dark;--bg:light-dark(#fff,#10191e);--ink:light-dark(#121212,#e9eef1);--mut:light-dark(#5b6670,#9fb0bb);--line:light-dark(#dde3e8,#2a3a44);--panel:light-dark(#f3f5f7,#172630);--head:light-dark(#1e3a52,#0c1a24);--slate:light-dark(#2e6f8e,#7fb7d1);--green:light-dark(#1f9d4c,#4cc47a);--greens:light-dark(#e8f6ee,#163323);--red:light-dark(#c62a1f,#ff6a5c);--reds:light-dark(#fdecea,#3b1715)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif;overflow-x:clip}
+header{background:var(--head);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px max(2vw,14px);flex-wrap:wrap}
+header b{font-size:19px}header .who{display:flex;align-items:center;gap:8px;font-size:14px}
+header select{background:#fff;color:#121212}
+.shell{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:calc(100vh - 60px)}
+@media(max-width:760px){.shell{grid-template-columns:1fr}aside{display:flex;overflow-x:auto;border-right:0!important;border-bottom:1px solid var(--line)}aside a{flex:none}}
+aside{border-right:1px solid var(--line);padding:10px 0;background:var(--panel)}
+aside a{display:block;padding:10px 18px;color:var(--ink);text-decoration:none;border-left:3px solid transparent;font-weight:500}
+aside a.on{border-left-color:var(--slate);background:var(--bg);font-weight:600}
+main{padding:20px max(2vw,14px) 40px}
+h1{font-size:26px;margin:0 0 4px}.sub{color:var(--mut);margin:0 0 14px;max-width:75ch}
+select,input,button{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;min-height:40px;padding:0 10px}
+button{cursor:pointer;font-weight:500;white-space:nowrap}button:disabled{opacity:.45;cursor:default}
+button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}button.warn{color:var(--red);border-color:var(--red)}
+:focus-visible{outline:3px solid var(--slate);outline-offset:1px}
+.tool{display:flex;flex-wrap:wrap;gap:8px;align-items:end;margin:0 0 12px}
+label.f{display:flex;flex-direction:column;font-size:12px;color:var(--mut);gap:2px}
+.msg{margin:0 0 12px;padding:10px 12px;border-left:4px solid var(--slate);background:var(--panel)}.msg.err{border-color:var(--red);background:var(--reds)}.msg:empty{display:none}
+.tw{overflow-x:auto;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--mut);font-weight:600;background:var(--panel);white-space:nowrap}
+td.n,th.n{text-align:right}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--panel)}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--panel)}
+.open{background:var(--greens);color:var(--green)}.closed{background:var(--reds);color:var(--red)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:18px}
+.card{border:1px solid var(--line);padding:12px}.card small{color:var(--mut);display:block}.card b{font-size:26px}
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin:6px 0 18px}
+.fstep{background:var(--panel);padding:10px 14px 10px 22px;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%,14px 50%)}
+.fstep:first-child{clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%);padding-left:14px}.fstep b{display:block;font-size:22px}.fstep span{font-size:13px;color:var(--mut)}
+details summary{cursor:pointer;font-weight:600;margin:16px 0 6px}
+.empty{padding:22px;text-align:center;color:var(--mut);border:1px dashed var(--line)}
+td input,td select{min-height:34px;width:100%}
+code{font-size:13px}
+</style></head><body>
+<header><b>PlanGrid Admin</b><div class="who"><span id="conn">Connecting</span><label>Acting as <select id="me" aria-label="Acting as"></select></label></div></header>
+<div class="shell">
+<aside id="nav"><a href="#home">Home</a><a href="#users">Users</a><a href="#versions">Versions</a><a href="#workflow">Workflow</a><a href="#months">Closed months</a><a href="#audit">Audit</a></aside>
+<main><p class="msg" id="msg" role="status"></p><div id="view"><div class="empty">Loading</div></div></main>
+</div>
+<script>
+{
+const SRV="PlanGrid";const $=id=>document.getElementById(id);
+const nf=new Intl.NumberFormat("en-US",{maximumFractionDigits:0});const fmt=v=>v==null?"":nf.format(v);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const dt=s=>s?new Date(s).toLocaleString():"";
+const per=p=>p?String(p).slice(0,4)+"-"+String(p).slice(4,6):"";
+const PROD={p1:"Bourbon",p2:"Scotch",p3:"Whiskey",p4:"Tequila"};const item=k=>{const m=String(k).match(/^(p\d+)_(.+)$/);return m&&PROD[m[1]]?PROD[m[1]]+" "+m[2].replace("ml"," ml").replace("L"," L"):k};
+const S={mcp:null,o:null,me:null,view:"home",commit:null};
+function say(t,err){$("msg").textContent=t||"";$("msg").className="msg"+(err?" err":"")}
+function errText(e,w){const c=e&&e.code;if(c==="server_not_connected")return"The PlanGrid connector is not added to your Claude account.";if(c==="cancelled")return"Declined in Claude. Nothing changed.";
+ if(c==="server_unavailable"||c==="upstream_error")return w?"No reply from PlanGrid. It may have gone through. Refresh before trying again.":"No reply from PlanGrid. It may be waking up. Try again in a minute.";if(c==="tool_error")return"PlanGrid error: "+String(e.message||"").slice(0,300);return"Something failed ("+(c||"unknown")+")"}
+async function call(t,i){const r=await S.mcp.callTool(SRV,t,i,{cache:false});let p=r.payload;if(p&&typeof p==="object"&&"result" in p&&Object.keys(p).length===1)p=p.result;return p}
+async function act(t,i,ok){try{const r=await call(t,i);if(r&&(r.ok===false||r.error))return say(r.error,true),null;say(ok);await load();return r}catch(e){say(errText(e,true),true);return null}}
+async function load(){S.o=await call("admin_overview",{});render()}
+
+function render(){for(const a of document.querySelectorAll("aside a"))a.classList.toggle("on",a.getAttribute("href")==="#"+S.view);
+ const o=S.o;if(!o)return;const v=$("view");
+ if(S.view==="home"){const open=o.scenarios.filter(s=>s.status==="Open").length;
+  v.innerHTML=`<h1>Home</h1><p class="sub">The depletion forecast database: versions, people, the approval workflow and every change.</p>
+  <div class="cards"><div class="card"><small>Versions</small><b>${o.scenarios.length}</b><small>${open} open for editing</small></div><div class="card"><small>Users</small><b>${o.users.filter(u=>u.active).length}</b><small>${o.users.filter(u=>u.role==="Planner").length} planners</small></div>
+  <div class="card"><small>Saves</small><b>${fmt(o.saves)}</b><small>${fmt(o.cell_changes)} cell changes logged</small></div><div class="card"><small>Workflow steps taken</small><b>${fmt(o.status_changes)}</b><small>Months before ${esc(per(o.lockBefore))} closed</small></div></div>
+  <h3>Forecast workflow</h3><div class="flow">${o.workflow.map(w=>`<div class="fstep"><b>${w.markets}</b><span>${esc(w.name)}</span></div>`).join("")}</div>
+  <h3>Recent admin actions</h3>${o.adminLog.length?`<div class="tw"><table><tr><th>When</th><th>Who</th><th>Action</th><th>Detail</th></tr>${o.adminLog.slice(0,10).map(a=>`<tr><td>${dt(a.updated_at)}</td><td>${esc(a.updated_by)}</td><td>${esc(a.action)}</td><td>${esc(a.detail)}</td></tr>`).join("")}</table></div>`:`<div class="empty">No admin actions yet.</div>`}`}
+ else if(S.view==="users"){
+  v.innerHTML=`<h1>Users</h1><p class="sub">Who can work in the depletion forecast. Planners edit and submit their own markets. FP&amp;A reviews. The CFO approves. Admins manage this portal. Markets: a comma-separated list, or ALL.</p>
+  <div class="tool"><button class="pri" id="add">Add user</button></div>
+  <div class="tw"><table><tr><th>Name</th><th>Role</th><th>Markets</th><th>Active</th><th></th></tr>${o.users.map(u=>`<tr data-u="${u.user_id}"><td><input value="${esc(u.name)}" data-k="name" aria-label="Name"></td><td><select data-k="role" aria-label="Role">${o.roles.map(r=>`<option${r===u.role?" selected":""}>${esc(r)}</option>`).join("")}</select></td><td><input value="${esc(u.markets)}" data-k="markets" aria-label="Markets"></td><td><select data-k="active" aria-label="Active"><option value="1"${u.active?" selected":""}>Yes</option><option value="0"${u.active?"":" selected"}>No</option></select></td><td><button data-saveu="${u.user_id}">Save</button></td></tr>`).join("")}
+  <tr id="newrow" hidden data-u=""><td><input data-k="name" placeholder="Full name" aria-label="New name"></td><td><select data-k="role" aria-label="New role">${o.roles.map(r=>`<option>${esc(r)}</option>`).join("")}</select></td><td><input data-k="markets" placeholder="NC,SC or ALL" aria-label="New markets"></td><td><select data-k="active"><option value="1">Yes</option><option value="0">No</option></select></td><td><button class="pri" data-saveu="">Add</button></td></tr></table></div>`;
+  $("add").onclick=()=>{$("newrow").hidden=false;$("newrow").querySelector("input").focus()};
+  v.querySelectorAll("[data-saveu]").forEach(b=>b.onclick=async()=>{const tr=b.closest("tr"),g=k=>tr.querySelector(`[data-k="${k}"]`).value;const mk=g("markets").trim().toUpperCase();
+   const bad=mk!=="ALL"&&mk?mk.split(",").map(x=>x.trim()).filter(x=>x&&!o.allMarkets.includes(x)):[];if(bad.length)return say("Unknown market: "+bad.join(", "),true);
+   await act("upsert_user",{name:g("name"),role:g("role"),markets:mk==="ALL"?"ALL":mk.split(",").map(x=>x.trim()).filter(Boolean),active:g("active")==="1",user_id:tr.dataset.u?+tr.dataset.u:null,admin_user_id:S.me},`Saved ${g("name")}.`)})}
+ else if(S.view==="versions"){
+  v.innerHTML=`<h1>Versions</h1><p class="sub">Each version is a full set of numbers, like a scenario in Aimplan. Open versions can be edited in the forecasting tool. Closed versions are read only. Copy a version to freeze a snapshot, for example the forecast at CFO approval.</p>
+  <div class="tw"><table><tr><th>Version</th><th>Status</th><th>Kind</th><th>Description</th><th class="n">2026 total, cases</th><th class="n">Cells</th><th>Periods</th><th>Last change</th><th></th></tr>${o.scenarios.map(s=>`<tr><td><b>${esc(s.scenario)}</b></td><td><span class="chip ${s.status==="Open"?"open":"closed"}">${esc(s.status)}</span></td><td>${esc(s.kind)}</td><td>${esc(s.description)}</td><td class="n">${fmt(s.total)}</td><td class="n">${fmt(s.cells)}</td><td>${esc(per(s.firstPeriod))} to ${esc(per(s.lastPeriod))}</td><td>${dt(s.lastChange)}</td><td><button data-tog="${esc(s.scenario)}" data-to="${s.status==="Open"?"Closed":"Open"}">${s.status==="Open"?"Close":"Open"}</button></td></tr>`).join("")}</table></div>
+  <h3 style="margin-top:20px">Copy a version</h3><div class="tool"><label class="f">From<select id="src">${o.scenarios.map(s=>`<option${s.scenario==="Forecast"?" selected":""}>${esc(s.scenario)}</option>`).join("")}</select></label><label class="f">New name<input id="tgt" value="Forecast ${new Date().toLocaleDateString("en-US",{month:"short",day:"numeric"})}"></label><label class="f">Description<input id="tdesc" placeholder="Why this snapshot" style="min-width:260px"></label><button class="pri" id="copy">Copy</button></div>`;
+  v.querySelectorAll("[data-tog]").forEach(b=>b.onclick=()=>act("set_scenario",{scenario:b.dataset.tog,status:b.dataset.to,user_id:S.me},`${b.dataset.tog} is now ${b.dataset.to}.`));
+  $("copy").onclick=async()=>{$("copy").disabled=true;const r=await act("copy_scenario",{source:$("src").value,target:$("tgt").value.trim(),comment:$("tdesc").value.trim(),user_id:S.me},"Copied.");if(r)say(`Copied ${fmt(r.copied)} cells into ${r.target}. It starts Closed.`);$("copy").disabled=false}}
+ else if(S.view==="workflow"){
+  v.innerHTML=`<h1>Workflow</h1><p class="sub">The Forecast moves through four statuses per market, like an Aimplan process. Who can do what is fixed in the database.</p>
+  <div class="flow">${o.workflow.map(w=>`<div class="fstep"><b>${w.markets}</b><span>${esc(w.name)}</span></div>`).join("")}</div>
+  <div class="tw"><table><tr><th>Step</th><th>Who</th><th>Moves the market</th><th>Editing</th></tr>
+  <tr><td>Submit</td><td>Planner for the market, Admin</td><td>Agent Draft to Planner Submitted</td><td>Planner edits only at Agent Draft</td></tr>
+  <tr><td>Review</td><td>FP&amp;A, Admin</td><td>Planner Submitted to FP&amp;A Reviewed</td><td>FP&amp;A can adjust up to Planner Submitted</td></tr>
+  <tr><td>Approve</td><td>CFO, Admin</td><td>FP&amp;A Reviewed to CFO Approved</td><td>CFO does not edit numbers</td></tr>
+  <tr><td>Send back</td><td>FP&amp;A, CFO, Admin. A note is required</td><td>Any later status back to Agent Draft</td><td>Planner can edit again</td></tr>
+  <tr><td>Reopen review</td><td>CFO, Admin</td><td>CFO Approved to FP&amp;A Reviewed</td><td></td></tr></table></div>
+  <h3 style="margin-top:20px">Recent workflow steps</h3>${o.statusLog.length?`<div class="tw"><table><tr><th>When</th><th>Market</th><th>Who</th><th>From</th><th>To</th><th>Note</th></tr>${o.statusLog.map(s=>`<tr><td>${dt(s.updated_at)}</td><td>${esc(s.market)}</td><td>${esc(s.updated_by)}</td><td>${esc(o.statuses[s.old_status]||"")}</td><td>${esc(o.statuses[s.new_status]||"")}</td><td>${esc(s.note)}</td></tr>`).join("")}</table></div>`:`<div class="empty">No workflow steps yet.</div>`}`}
+ else if(S.view==="months"){
+  v.innerHTML=`<h1>Closed months</h1><p class="sub">Months before the first open month are read only in every version, for everyone. Move it forward at month-end close, after actuals are loaded.</p>
+  <div class="tool"><label class="f">First open month<input type="month" id="lb" value="${o.lockBefore?String(o.lockBefore).slice(0,4)+"-"+String(o.lockBefore).slice(4,6):""}"></label><button class="pri" id="setlb">Save</button></div>
+  <p class="sub">Now: months before <b>${esc(per(o.lockBefore)||"none")}</b> are closed.</p>`;
+  $("setlb").onclick=()=>{const x=$("lb").value;act("set_lock_before",{lock_before:x?+(x.replace("-","")+"01"):null,user_id:S.me},"Closed months updated.")}}
+ else if(S.view==="audit"){v.innerHTML=`<h1>Audit</h1><p class="sub">Every save, newest first. Open a save to see each cell's old and new value. Reversing a save writes the old values back as a new save, so the history stays complete.</p><div id="aud">Loading</div>`;loadAudit()}}
+async function loadAudit(){try{const h=await call("get_history",{limit:60});const a=$("aud");if(!a)return;
+ a.innerHTML=`<div class="tw"><table><tr><th>Save</th><th>When</th><th>Who</th><th>Version</th><th>Markets</th><th>Note</th><th class="n">Cells</th><th class="n">Net change</th></tr>${h.commits.map(c=>`<tr class="click" data-c="${c.CommitId}"><td>${c.CommitId}</td><td>${dt(c.UpdatedAt)}</td><td>${esc(c.UpdatedBy)}</td><td>${esc(c.ScenarioKey)}</td><td>${esc(c.Markets)}</td><td>${esc(c.Comment)}</td><td class="n">${fmt(c.CellCount)}</td><td class="n">${(c.NetChange>0?"+":"")+fmt(c.NetChange)}</td></tr>`).join("")}</table></div><div id="det"></div>`;
+ a.querySelectorAll("tr[data-c]").forEach(t=>t.onclick=()=>showCommit(+t.dataset.c))}catch(e){say(errText(e),true)}}
+async function showCommit(id){try{const d=await call("get_commit",{commit_id:id});const el=$("det");if(!el)return;if(d.error){el.innerHTML=`<p class="sub">${esc(d.error)}</p>`;return}
+ el.innerHTML=`<h3 style="margin-top:20px">Save ${d.commit.commit_id}: ${esc(d.commit.updated_by)}, ${dt(d.commit.updated_at)}</h3><p class="sub">${esc(d.commit.comment||"No note")}</p>
+ ${d.changes.length?`<div class="tool"><button class="warn" id="rev">Reverse this save</button></div><div class="tw"><table><tr><th>Market</th><th>Product</th><th>Month</th><th class="n">Old</th><th class="n">New</th><th class="n">Change</th></tr>${d.changes.map(c=>`<tr><td>${esc(c.market)}</td><td>${esc(item(c.item))}</td><td>${esc(per(c.period))}</td><td class="n">${fmt(c.old_value)}</td><td class="n">${fmt(c.new_value)}</td><td class="n">${fmt((c.new_value||0)-(c.old_value||0))}</td></tr>`).join("")}</table></div>`:`<p class="sub">Bulk loads and copies are not logged cell by cell and cannot be reversed.</p>`}`;
+ el.scrollIntoView({behavior:"smooth",block:"start"});const r=$("rev");if(r)r.onclick=async()=>{r.disabled=true;const x=await act("revert_commit",{commit_id:id,user_id:S.me},"Reversed.");if(x){if(x.conflicts&&x.conflicts.length)say(`Not reversed: ${x.conflicts.length} of those cells changed since. Reverse the later saves first.`,true);else if(x.saved)say(`Reversed save ${id} as save ${x.commitId}.`);S.view="audit";render()}r.disabled=false}}catch(e){say(errText(e),true)}}
+function route(){const h=location.hash.slice(1);S.view=["home","users","versions","workflow","months","audit"].includes(h)?h:"home";say("");render()}
+addEventListener("hashchange",route);
+$("me").onchange=e=>{S.me=+e.target.value};
+async function boot(){let t=0;while(!window.claude&&t++<30)await new Promise(r=>setTimeout(r,100));
+ const m=window.claude?await window.claude.use("mcp").catch(()=>null):null;if(!m){$("conn").textContent="Not connected";$("view").innerHTML=`<div class="empty">Open this page in Claude with the PlanGrid connector added.</div>`;return}
+ S.mcp=m;try{const opt=await call("list_options",{});const admins=opt.users.filter(u=>u.role==="Admin");if(!admins.length){$("view").innerHTML=`<div class="empty">No Admin user exists.</div>`;return}
+  $("me").innerHTML=admins.map(u=>`<option value="${u.user_id}">${esc(u.name)}</option>`).join("");S.me=admins[0].user_id;await load()}catch(e){$("conn").textContent="Not connected";$("view").innerHTML=`<div class="empty">${esc(errText(e))}</div>`;return}
+ $("conn").innerHTML=`<span style="color:#4cc47a">●</span> Live`;route()}
+boot();
+}
+</script></body></html>

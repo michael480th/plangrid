@@ -11,3 +11,10 @@ Workflow per market: Agent Draft, Planner Submitted, FP&A Reviewed, CFO Approved
 - `seed.csv.gz`, `seed_extra.json`: depletion demo data (2025 and 2026), markets, agent explanations
 
 Demo build: access control is the secret in the address, and users pick who they are. Real sign-in comes next.
+
+## Pages
+
+- `pages/depletion.html`: Depletion Forecasting, the planning tool (Claude artifact https://claude.ai/artifact/72gSMESXh7nQqfcujyP24z)
+- `pages/admin.html`: PlanGrid Admin (Claude artifact https://claude.ai/artifact/5KPHJ6nyMV6mToyuwUvKb9)
+
+Both call the connector named `PlanGrid` in Claude.

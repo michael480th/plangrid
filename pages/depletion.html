@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Depletion Forecasting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a finance team's working tool during a forecast cycle. Calm, exact, decisions first.
+   IDEA: the cycle board on a planning room wall: fifty markets moving from Agent Draft to CFO Approved.
+   PICTURE: the four-step pipeline with live counts, then the market list ranked by where people disagree.
+   COLOUR and TYPE: white, ink, green for the agent (as in the pitch), slate for comparisons, red only for gaps and unsaved. Source Serif 4 titles, Inter figures.
+   LAYOUT: top bar with role, pipeline and national figures, then the view: Cycle, Market, FP&A review, CFO approval. */
+:root{color-scheme:light dark;--bg:light-dark(#fff,#10191e);--ink:light-dark(#121212,#e9eef1);--mut:light-dark(#5b6670,#9fb0bb);--line:light-dark(#dde3e8,#2a3a44);--panel:light-dark(#f2f5f7,#172630);--slate:light-dark(#2e6f8e,#7fb7d1);--green:light-dark(#1f9d4c,#4cc47a);--greens:light-dark(#e8f6ee,#163323);--red:light-dark(#c62a1f,#ff6a5c);--reds:light-dark(#fdecea,#3b1715);--dirty:light-dark(#fff1c2,#4a3d10);--lock:light-dark(#f3f5f6,#16222a);--sel:light-dark(#cfe3ee,#23465a)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(16px,2.5vw,32px) max(3vw,14px);max-width:1440px;margin:0 auto}
+a{color:var(--slate)}
+.top{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:12px}
+.tab{background:var(--red);color:#fff;font:600 12px Inter;padding:3px 8px}
+h1{font:600 clamp(26px,3vw,38px)/1.05 "Source Serif 4",Georgia,serif;margin:0}
+h2{font:600 24px/1.15 "Source Serif 4",Georgia,serif;margin:0 0 6px}
+h3{font-size:16px;margin:0 0 8px}
+.who{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--mut)}
+select,input,textarea,button{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;min-height:44px;padding:0 10px}
+textarea{padding:10px;width:100%;min-height:72px;resize:vertical}
+button{cursor:pointer;font-weight:500;white-space:nowrap}button:disabled{opacity:.45;cursor:default}
+button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button.go{background:var(--green);color:#fff;border-color:var(--green)}
+button.warn{border-color:var(--red);color:var(--red)}
+:focus-visible{outline:3px solid var(--slate);outline-offset:1px}
+nav.views{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:16px 0 0;overflow-x:auto}
+nav.views a{padding:10px 14px;text-decoration:none;color:var(--mut);font-weight:600;border-bottom:3px solid transparent;flex:none}
+nav.views a.on{color:var(--ink);border-bottom-color:var(--ink)}
+.pipe{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin:14px 0 6px}
+.step{background:var(--panel);padding:10px 14px 10px 22px;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%,14px 50%);cursor:pointer;border:0;text-align:left;min-height:64px;border-radius:0}
+.step:first-child{clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%);padding-left:14px}
+.step b{display:block;font-size:24px;line-height:1.1;font-variant-numeric:tabular-nums}.step span{font-size:13px;color:var(--mut)}
+.step.agent{background:var(--greens)}.step.on{outline:2px solid var(--ink);outline-offset:-2px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:12px 0}
+.kpi{border-top:3px solid var(--ink);padding-top:6px}.kpi.ag{border-color:var(--green)}.kpi.ly{border-color:var(--slate)}
+.kpi small{display:block;color:var(--mut);font-size:13px}.kpi b{font-size:clamp(22px,2.4vw,30px);font-variant-numeric:tabular-nums}.kpi em{font-style:normal;font-size:13px;color:var(--mut);display:block}
+.msg{margin:12px 0 0;padding:10px 12px;border-left:4px solid var(--slate);background:var(--panel);font-size:15px}.msg.err{border-color:var(--red);background:var(--reds)}.msg:empty{display:none}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:end;margin:12px 0}
+label.f{display:flex;flex-direction:column;font-size:13px;color:var(--mut);gap:3px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+.list th,.list td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.list th{font-size:13px;color:var(--mut);font-weight:600;position:sticky;top:0;background:var(--bg)}
+.list th:nth-child(-n+4),.list td:nth-child(-n+4){text-align:left}
+.list tr.r{cursor:pointer}.list tr.r:hover td{background:var(--panel)}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--panel)}
+.s10{background:var(--greens);color:var(--green)}.s20{background:light-dark(#e6eef8,#1b2a3d);color:var(--slate)}.s30{background:light-dark(#efe9fb,#2a2240);color:light-dark(#5b3fa8,#b9a6ef)}.s40{background:var(--ink);color:var(--bg)}
+.gap{font-weight:600}.gap.hi{color:var(--red)}
+.wrap{overflow-x:auto;border:1px solid var(--line)}
+.mkt{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.lower{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:14px;align-items:start}
+@media(max-width:900px){.lower{grid-template-columns:1fr}}
+.side{display:grid;gap:14px}
+.card{border:1px solid var(--line);padding:14px}
+.card.agent{border-top:3px solid var(--green);background:var(--greens)}
+.card.agent h3{color:var(--green)}
+.thread{display:grid;gap:10px;max-height:420px;overflow:auto}
+.cm{font-size:14px;border-left:3px solid var(--line);padding:2px 0 2px 10px}.cm.agent{border-color:var(--green)}.cm.status{border-color:var(--slate)}
+.cm b{font-size:13px}.cm time{font-size:12px;color:var(--mut);margin-left:6px}
+.mhead{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;justify-content:space-between;margin:14px 0 8px}
+.mhead .meta{color:var(--mut);font-size:14px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:end;background:var(--panel);padding:10px;border-top:3px solid var(--ink)}
+.bar .sp{flex:1}.pct{width:84px}#note{width:220px}
+.g{font-size:14px;user-select:none}
+.g th,.g td{border-bottom:1px solid var(--line);padding:5px 7px;text-align:right;white-space:nowrap;height:46px}
+.g thead th{font-weight:600;font-size:13px;color:var(--mut);background:var(--bg);position:sticky;top:0}
+.g th.it,.g td.it{text-align:left;position:sticky;left:0;background:var(--bg);z-index:1;min-width:150px}
+.pn{font-weight:600;display:inline-block;width:72px}.ps{color:var(--mut);font-size:14px}.g td.it.cont .pn{visibility:hidden}
+.g td.c{cursor:cell;min-width:54px;position:relative}
+.g td.lk{background:var(--lock);color:var(--mut);cursor:default}
+.g td.dt{background:var(--dirty)}.g td.cf{box-shadow:inset 0 0 0 2px var(--red)}
+.g td.sl{background:var(--sel)}.g td.ac{box-shadow:inset 0 0 0 2px var(--slate)}
+.g tr.tot td{font-weight:600;border-top:2px solid var(--ink)}.g td.tc{border-left:2px solid var(--ink);font-weight:600}
+.cmp{display:block;font-size:11.5px;color:var(--slate);line-height:1.1}.cmp.hi{font-weight:700}
+.g input.ed{position:absolute;inset:2px;width:calc(100% - 4px);min-height:0;height:calc(100% - 4px);text-align:right;padding:0 6px;border:2px solid var(--slate)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--mut);margin-top:8px}
+.sw{display:inline-block;width:14px;height:14px;vertical-align:-2px;margin-right:5px;border:1px solid var(--line)}
+.fig{position:relative;height:170px;margin-top:10px}.fig svg{position:absolute;inset:0;width:100%;height:100%}
+.hint{font-size:13px;color:var(--mut);margin:8px 0 0}
+details{margin-top:18px}summary{cursor:pointer;font-weight:600;padding:6px 0}
+.h th,.h td{text-align:left;padding:8px;border-bottom:1px solid var(--line);font-size:14px}.h td.n{text-align:right}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.empty{padding:28px;text-align:center;color:var(--mut);border:1px dashed var(--line)}
+.calls{display:grid;gap:12px}
+.call{display:grid;grid-template-columns:70px minmax(0,1fr) auto;gap:14px;align-items:center;border:1px solid var(--line);padding:12px}
+.call .mk{font-size:22px;font-weight:700}
+.call p{margin:2px 0 0;font-size:14px;color:var(--mut)}
+@media(max-width:700px){.call{grid-template-columns:1fr}.pipe{grid-template-columns:1fr 1fr}#note{width:100%}}
+@media(prefers-reduced-motion:no-preference){.g td.dt{transition:background .25s}}
+@media(max-width:700px){table{font-size:13px}.list th:nth-child(2),.list td:nth-child(2),.list th:nth-child(3),.list td:nth-child(3),.list th:nth-child(9),.list td:nth-child(9),.list th:nth-child(10),.list td:nth-child(10){display:none}}
+</style></head><body>
+<div class="band">
+ <div class="top">
+  <div class="brand"><span class="tab">Plan in BI</span><h1>Depletion Forecasting</h1></div>
+  <div class="who"><span id="conn">Connecting</span><label class="f" style="flex-direction:row;align-items:center;gap:6px">Working as<select id="me" aria-label="Working as"></select></label></div>
+ </div>
+ <div class="pipe" id="pipe" aria-label="Workflow"></div>
+ <nav class="views" id="views"><a href="#cycle">Cycle</a><a href="#review">FP&amp;A review</a><a href="#cfo">CFO approval</a><a href="#market" id="mtab">Market</a></nav>
+ <p class="msg" id="msg" role="status"></p>
+ <main id="view"><div class="empty">Loading the forecast</div></main>
+</div>
+<script>
+{
+const SRV="PlanGrid",FC="Forecast",AG="Agent 2+10",LY="Last year actuals";
+const $=id=>document.getElementById(id);
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const nf=new Intl.NumberFormat("en-US",{maximumFractionDigits:0});
+const fmt=v=>v==null||v===""?"":nf.format(v);
+const pct=(a,b)=>b?((a/b-1)*100):null;
+const fp=v=>v==null||!isFinite(v)?"":(v>0?"+":"")+v.toFixed(1)+"%";
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const K=(i,p)=>i+"|"+p;
+const mon=p=>MON[+String(p).slice(4,6)-1]+" "+String(p).slice(2,4);
+const PROD={p1:"Bourbon",p2:"Scotch",p3:"Whiskey",p4:"Tequila"};
+const SIZE={"50ml":["50 ml",1],"375ml":["375 ml",2],"750ml":["750 ml",3],"1.0L":["1.0 L",4],"1.75L":["1.75 L",5]};
+const itemInfo=k=>{const m=String(k).match(/^(p\d+)_(.+)$/);if(m&&PROD[m[1]]&&SIZE[m[2]])return{prod:PROD[m[1]],size:SIZE[m[2]][0],o:m[1]+SIZE[m[2]][1]};return{prod:String(k),size:"",o:String(k)}};
+const ST={10:"Agent Draft",20:"Planner Submitted",30:"FP&A Reviewed",40:"CFO Approved"};
+const GAP=5; // percent difference between planner and agent that needs a look
+const S={mcp:null,opts:null,board:null,me:null,view:"cycle",market:null,grid:null,mk:null,edits:new Map(),undo:[],conflicts:new Map(),act:{r:0,c:0},anc:null,editing:false,busy:false,filter:{status:"",scope:"mine",q:""},cmp:AG};
+
+function say(t,err){const m=$("msg");m.textContent=t||"";m.className="msg"+(err?" err":"")}
+function errText(e,write){const c=e&&e.code;
+ if(c==="server_not_connected")return"The PlanGrid connector is not added to your Claude account. Add it under Settings, Connectors, then reload.";
+ if(c==="cancelled")return write?"Claude asked to allow this and it was declined. Nothing changed.":"Cancelled.";
+ if(c==="approval_required")return"Claude needs your permission for this. Click again and allow it.";
+ if(c==="not_in_manifest")return"This page is not allowed to use PlanGrid for you. Allow it in Claude and reload.";
+ if(c==="server_unavailable"||c==="upstream_error")return write?"No reply from PlanGrid. It may have gone through. Reload before trying again.":"No reply from PlanGrid. The service may be waking up. Try again in a minute.";
+ if(c==="tool_error")return"PlanGrid reported an error: "+String(e.message||"").slice(0,300);
+ return"Something failed ("+(c||"unknown")+")"}
+async function call(tool,input){const r=await S.mcp.callTool(SRV,tool,input,{cache:false});let p=r.payload;if(p&&typeof p==="object"&&"result" in p&&Object.keys(p).length===1)p=p.result;return p}
+const meU=()=>S.opts&&S.opts.users.find(u=>u.user_id===S.me);
+const mine=m=>{const u=meU();return u&&(u.markets==="ALL"||u.markets.split(",").includes(m))};
+const role=()=>(meU()||{}).role||"";
+
+/* ---------- top: pipeline and national figures ---------- */
+function renderTop(){const b=S.board;if(!b)return;const n={10:0,20:0,30:0,40:0};for(const m of b.markets)n[m.status||10]++;
+ const who={10:"Agent drafted, planner to review",20:"Waiting for FP&A",30:"Waiting for the CFO",40:"Plan of record"};
+ $("pipe").innerHTML=[10,20,30,40].map(s=>`<button class="step${s===10?" agent":""}${S.filter.status==s&&S.view==="cycle"?" on":""}" data-s="${s}"><b>${n[s]}</b><span>${ST[s]}. ${who[s]}</span></button>`).join("");
+ for(const a of document.querySelectorAll("nav.views a"))a.classList.toggle("on",a.getAttribute("href")==="#"+S.view||(S.view==="market"&&a.id==="mtab"));
+ $("mtab").textContent=S.market?"Market: "+S.market:"Market";}
+$("pipe").onclick=e=>{const b=e.target.closest("button.step");if(!b)return;S.filter.status=S.filter.status===b.dataset.s?"":b.dataset.s;S.filter.scope="all";location.hash="cycle";route()};
+function kpis(rows){const t=k=>rows.reduce((a,m)=>a+(m[k]||0),0);const fc=t("forecast"),ag=t("compare"),ly=t("lastYear");
+ return`<div class="kpis"><div class="kpi"><small>Planners' forecast ${S.opts.planYear}</small><b>${fmt(fc)}</b><em>${fp(pct(fc,ly))} on ${S.opts.planYear-1}</em></div>
+ <div class="kpi ag"><small>Agent draft</small><b>${fmt(ag)}</b><em>${fp(pct(ag,ly))} on ${S.opts.planYear-1}</em></div>
+ <div class="kpi"><small>Planners vs agent</small><b>${fp(pct(fc,ag))}</b><em>${fmt(fc-ag)} cases</em></div>
+ <div class="kpi ly"><small>${S.opts.planYear-1} actuals</small><b>${fmt(ly)}</b><em>9-litre cases</em></div></div>`}
+
+/* ---------- cycle view ---------- */
+function rowsFor(){let r=S.board.markets.map(m=>({...m,gap:pct(m.forecast,m.compare)}));
+ if(S.filter.scope==="mine")r=r.filter(m=>mine(m.market));
+ if(S.filter.status)r=r.filter(m=>String(m.status||10)===String(S.filter.status));
+ if(S.filter.q){const q=S.filter.q.toLowerCase();r=r.filter(m=>[m.market,m.region,m.regional_manager,m.business_unit].some(x=>String(x||"").toLowerCase().includes(q)))}
+ return r}
+function marketTable(rows,cols){if(!rows.length)return`<div class="empty">No markets match.</div>`;
+ return`<div class="wrap"><table class="list"><thead><tr><th>Market</th><th>Region</th><th>Planner</th><th>Status</th><th>Forecast</th><th>Agent</th><th>Planners vs agent</th><th>vs ${S.opts.planYear-1}</th><th>Jan-Feb actual</th><th>Latest note</th></tr></thead><tbody>${
+ rows.map(m=>`<tr class="r" data-m="${esc(m.market)}"><td><b>${esc(m.market)}</b></td><td>${esc(m.region||"")}</td><td>${esc(m.regional_manager||"")}</td><td><span class="chip s${m.status||10}">${esc(ST[m.status||10])}</span></td><td>${fmt(m.forecast)}</td><td>${fmt(m.compare)}</td><td class="gap${Math.abs(m.gap||0)>GAP?" hi":""}">${fp(m.gap)}</td><td>${fp(pct(m.forecast,m.lastYear))}</td><td>${fmt(m.ytdActual)}</td><td style="text-align:left;white-space:normal;max-width:280px;font-size:13px;color:var(--mut)">${m.lastNote?esc(m.lastNote.author+": "+m.lastNote.text.slice(0,90)):""}</td></tr>`).join("")}</tbody></table></div>`}
+function viewCycle(){const r=rowsFor();
+ $("view").innerHTML=kpis(S.board.markets)+`<div class="filters"><label class="f">Show<select id="scope"><option value="mine">My markets</option><option value="all">All markets</option></select></label>
+ <label class="f">Status<select id="fst"><option value="">Any</option>${[10,20,30,40].map(s=>`<option value="${s}">${ST[s]}</option>`).join("")}</select></label>
+ <label class="f">Find<input id="q" placeholder="Market, region or planner" value="${esc(S.filter.q)}"></label></div>
+ <p class="hint">Sorted by the gap between the planners' forecast and the agent's draft. Gaps over ${GAP}% are red. Click a market to open it.</p>`+marketTable(r.sort((a,b)=>Math.abs(b.gap||0)-Math.abs(a.gap||0)));
+ $("scope").value=S.filter.scope;$("fst").value=S.filter.status;
+ $("scope").onchange=e=>{S.filter.scope=e.target.value;viewCycle();renderTop()};$("fst").onchange=e=>{S.filter.status=e.target.value;viewCycle();renderTop()};
+ $("q").oninput=e=>{S.filter.q=e.target.value;const t=$("view").querySelector(".wrap,.empty");const r2=rowsFor().sort((a,b)=>Math.abs(b.gap||0)-Math.abs(a.gap||0));t.outerHTML=marketTable(r2)}}
+$("view").addEventListener("click",e=>{const tr=e.target.closest("tr.r,[data-open]");if(tr){location.hash="market-"+(tr.dataset.m||tr.dataset.open).toLowerCase()}});
+
+/* ---------- FP&A review ---------- */
+function viewReview(){const all=S.board.markets.map(m=>({...m,gap:pct(m.forecast,m.compare)}));
+ const sub=all.filter(m=>m.status===20).sort((a,b)=>Math.abs(b.gap||0)-Math.abs(a.gap||0));
+ const look=sub.filter(m=>Math.abs(m.gap||0)>GAP),ok=sub.filter(m=>Math.abs(m.gap||0)<=GAP);
+ const can=["FP&A","Admin"].includes(role());
+ $("view").innerHTML=`<h2 style="margin-top:16px">FP&amp;A review</h2><p class="hint" style="margin-top:0">${sub.length} markets submitted. ${look.length} differ from the agent by more than ${GAP}% and need a look. ${ok.length} are within ${GAP}% and can be reviewed together.${can?"":" Switch to an FP&A user to act."}</p>
+ <h3 style="margin-top:14px">Needs a look</h3>${look.length?`<div class="calls">${look.map(m=>callCard(m,"review")).join("")}</div>`:`<div class="empty">Nothing over ${GAP}% waiting.</div>`}
+ <h3 style="margin-top:18px">Within ${GAP}% of the agent</h3>${ok.length?`${can?`<button class="go" id="bulk">Mark all ${ok.length} reviewed</button>`:""}${marketTable(ok)}`:`<div class="empty">None waiting.</div>`}`;
+ const bk=$("bulk");if(bk)bk.onclick=()=>bulk(ok.map(m=>m.market),"review")}
+function callCard(m,act){const can=act==="review"?["FP&A","Admin"].includes(role()):["CFO","Admin"].includes(role());
+ return`<div class="call"><div class="mk">${esc(m.market)}</div><div><b>Planners ${fmt(m.forecast)}</b> vs agent ${fmt(m.compare)} <span class="gap hi">${fp(m.gap)}</span>, ${fp(pct(m.forecast,m.lastYear))} on ${S.opts.planYear-1}<p>${esc(m.regional_manager||"")}${m.lastNote?" · "+esc(m.lastNote.text.slice(0,160)):""}</p></div>
+ <div class="acts"><button data-open="${esc(m.market)}">Open</button>${can?`<button class="go" data-act="${act}" data-mk="${esc(m.market)}">${act==="review"?"Mark reviewed":"Approve"}</button><button class="warn" data-act="send_back" data-mk="${esc(m.market)}">Send back</button>`:""}</div></div>`}
+$("view").addEventListener("click",async e=>{const b=e.target.closest("button[data-act]");if(!b)return;e.stopPropagation();const act=b.dataset.act,mk=b.dataset.mk;
+ let note="";if(act==="send_back"){note=await ask(`Send ${mk} back to the planner`,"What needs to change?");if(note==null)return}
+ await doStatus(mk,act,note)});
+
+/* ---------- CFO approval ---------- */
+function viewCfo(){const all=S.board.markets.map(m=>({...m,gap:pct(m.forecast,m.compare)}));
+ const rev=all.filter(m=>m.status===30).sort((a,b)=>Math.abs(b.forecast-b.compare)-Math.abs(a.forecast-a.compare));
+ const big=rev.filter(m=>Math.abs(m.gap||0)>GAP),appr=all.filter(m=>m.status===40);const can=["CFO","Admin"].includes(role());
+ const t=(r,k)=>r.reduce((a,m)=>a+(m[k]||0),0);
+ $("view").innerHTML=`<h2 style="margin-top:16px">CFO approval</h2>${kpis(all)}
+ <p class="hint" style="margin-top:0">${rev.length} markets reviewed by FP&amp;A and waiting for approval, ${fmt(t(rev,"forecast"))} cases. ${appr.length} approved so far, ${fmt(t(appr,"forecast"))} cases.${can?"":" Switch to the CFO to act."}</p>
+ <h3 style="margin-top:14px">Calls to make: planners and agent disagree by more than ${GAP}%</h3>${big.length?`<div class="calls">${big.map(m=>callCard(m,"approve")).join("")}</div>`:`<div class="empty">No reviewed market differs from the agent by more than ${GAP}%.</div>`}
+ <h3 style="margin-top:18px">Ready to approve</h3>${rev.filter(m=>Math.abs(m.gap||0)<=GAP).length?`${can?`<button class="go" id="bulk">Approve ${rev.filter(m=>Math.abs(m.gap||0)<=GAP).length} markets within ${GAP}%</button>`:""}${marketTable(rev.filter(m=>Math.abs(m.gap||0)<=GAP))}`:`<div class="empty">None waiting.</div>`}`;
+ const bk=$("bulk");if(bk)bk.onclick=()=>bulk(rev.filter(m=>Math.abs(m.gap||0)<=GAP).map(m=>m.market),"approve")}
+async function bulk(list,act){if(!list.length)return;S.busy=true;let ok=0,bad=[];for(const mk of list){try{const r=await call("set_status",{scenario:FC,market:mk,action:act,user_id:S.me});r.ok?ok++:bad.push(mk+": "+r.error)}catch(e){bad.push(mk+": "+errText(e,true));break}}
+ S.busy=false;say(`${ok} markets ${act==="review"?"reviewed":"approved"}.`+(bad.length?" Not done: "+bad.join("; "):""),!!bad.length);await loadBoard();route()}
+async function doStatus(mk,act,note){try{const r=await call("set_status",{scenario:FC,market:mk,action:act,user_id:S.me,note:note||""});
+ if(!r.ok)return say(r.error,true);say(`${mk} is now ${r.statusName}.`);await loadBoard();if(S.view==="market"&&S.market===mk)await loadMarket(mk,true);else route()}catch(e){say(errText(e,true),true)}}
+
+/* small in-page prompt */
+function ask(title,label){return new Promise(res=>{const d=document.createElement("dialog");d.style.cssText="border:0;padding:0;max-width:min(520px,94vw);width:100%";
+ d.innerHTML=`<div style="background:var(--bg);color:var(--ink);padding:20px;border-top:4px solid var(--ink)"><h3>${esc(title)}</h3><label class="f">${esc(label)}<textarea id="askt"></textarea></label><div class="acts" style="justify-content:flex-end;margin-top:12px"><button id="askn">Cancel</button><button class="pri" id="asky">Send</button></div></div>`;
+ document.body.appendChild(d);d.showModal();const t=d.querySelector("#askt");t.focus();
+ const done=v=>{d.close();d.remove();res(v)};d.querySelector("#askn").onclick=()=>done(null);d.querySelector("#asky").onclick=()=>{if(!t.value.trim()){t.focus();return}done(t.value.trim())};d.addEventListener("cancel",()=>done(null))})}
+
+/* ---------- market view ---------- */
+const G=()=>S.grid;
+const val=(it,p)=>S.edits.has(K(it,p))?S.edits.get(K(it,p)):G().cells[K(it,p)]??null;
+const locked=p=>G().readOnly||(G().lockBefore&&p<G().lockBefore);
+const rowTot=it=>G().periods.reduce((a,p)=>a+(val(it,p)||0),0);
+const colTot=p=>G().items.reduce((a,it)=>a+(val(it,p)||0),0);
+const cmpV=(it,p)=>G().compareCells[K(it,p)]??null;
+async function loadMarket(mk,keep){S.market=mk;S.busy=true;renderTop();
+ try{const[g,m]=await Promise.all([call("get_grid",{scenario:FC,market:mk,compare:S.cmp,user_id:S.me}),call("get_market",{scenario:FC,market:mk})]);
+  g.items=g.items.filter(it=>g.periods.some(p=>g.cells[K(it,p)]||g.compareCells[K(it,p)])).sort((a,b)=>itemInfo(a).o.localeCompare(itemInfo(b).o));
+  S.grid=g;S.mk=m;if(!keep){S.edits.clear();S.undo=[];S.conflicts.clear();S.act={r:0,c:0};S.anc=null}}
+ catch(e){S.busy=false;return say(errText(e),true)}
+ S.busy=false;viewMarket()}
+function viewMarket(){const g=G(),m=S.mk;if(!g||g.market!==S.market){$("view").innerHTML=`<div class="empty">Loading ${esc(S.market||"")}</div>`;return}
+ const info=m.market||{},st=m.status||10,r=role();
+ const agentNote=m.comments.filter(c=>c.kind==="agent").pop();
+ const acts=[];
+ if(st===10&&(r==="Admin"||(r==="Planner"&&mine(g.market))))acts.push(`<button class="go" data-act2="submit">Submit to FP&amp;A</button>`);
+ if(st===20&&["FP&A","Admin"].includes(r))acts.push(`<button class="go" data-act2="review">Mark reviewed</button>`);
+ if(st===30&&["CFO","Admin"].includes(r))acts.push(`<button class="go" data-act2="approve">Approve</button>`);
+ if(st>=20&&["FP&A","CFO","Admin"].includes(r)&&!(r==="FP&A"&&st>30))acts.push(`<button class="warn" data-act2="send_back">Send back</button>`);
+ $("view").innerHTML=`<div class="mhead"><div><h2>${esc(g.market)} <span class="chip s${st}" style="vertical-align:4px">${esc(ST[st])}</span></h2><div class="meta">${esc([info.region,info.business_unit&&("BU "+info.business_unit),info.regional_manager&&("Planner "+info.regional_manager),info.channel].filter(Boolean).join(" · "))}</div></div><div class="acts">${acts.join("")}</div></div>
+ <div class="mkt">
+ <div class="card agent"><h3>Agent explanation</h3><div style="font-size:15px">${agentNote?esc(agentNote.text):"No agent explanation for this market."}</div></div>
+ <div>
+ <div class="bar"><label class="f">Compare with<select id="cmpS">${[AG,LY,"Plan"].map(x=>`<option${x===S.cmp?" selected":""}>${esc(x)}</option>`).join("")}</select></label>
+  <label class="f">Adjust selection<span style="display:flex;gap:6px"><input id="pct" class="pct" inputmode="decimal" placeholder="+5%"><button id="apply">Apply</button></span></label>
+  <span class="sp"></span><button id="undo">Undo</button><button id="discard">Discard</button>
+  <label class="f">Note for this save<input id="note" placeholder="Optional"></label><button id="save" class="pri" style="min-width:150px">Save</button></div>
+ ${g.readOnly?`<p class="msg">${esc(g.readOnlyReason||"Read only")}</p>`:""}
+ <div class="wrap" style="margin-top:10px"><table class="g" id="grid" tabindex="0" aria-label="Forecast grid"></table></div>
+ <div class="legend"><span><i class="sw" style="background:var(--dirty)"></i>Unsaved</span><span><i class="sw" style="background:var(--lock)"></i>Closed or read only</span><span><i class="sw" style="box-shadow:inset 0 0 0 2px var(--red)"></i>Changed by someone else</span><span style="color:var(--slate)">Small figure: ${esc(S.cmp)}, bold when more than ${GAP}% apart</span><span>9-litre cases</span></div>
+ <p class="hint">Type a number to set a cell. +5%, -3%, *1.1 or +200 adjust it. A total spreads across its row or column in proportion to current values. Shift+click or Shift+arrows select a range. Paste from Excel at the active cell.</p>
+ </div>
+ <div class="lower"><div><div class="card"><h3>Monthly total</h3><div class="fig"><svg id="chart" role="img" aria-label="Monthly forecast against comparison"></svg></div></div>
+ <details id="hist"><summary>Save history for ${esc(g.market)}</summary><div id="histb">Loading</div></details></div>
+ <div class="card"><h3>Conversation</h3><div class="thread">${m.comments.filter(c=>c.kind!=="agent").map(c=>`<div class="cm ${esc(c.kind)}"><b>${esc(c.author)}</b><time>${new Date(c.created_at).toLocaleString()}</time><div>${esc(c.text)}</div></div>`).join("")||`<div class="hint">No notes yet. Tell the agent what is different this year.</div>`}</div>
+ <label class="f" style="margin-top:10px">Add a note<textarea id="cmt" placeholder="For example: chain reset in July, +8% on 750 ml"></textarea></label><button id="addc" style="margin-top:6px">Add note</button></div>
+ </div></div>`;
+ renderGrid();drawChart();
+ $("cmpS").onchange=e=>{S.cmp=e.target.value;loadMarket(g.market,true)};
+ $("apply").onclick=applySel;$("undo").onclick=doUndo;$("discard").onclick=()=>{S.edits.clear();S.undo=[];S.conflicts.clear();say("Changes discarded.");renderGrid()};
+ $("save").onclick=save;$("addc").onclick=addNote;
+ $("hist").ontoggle=async e=>{if(!e.target.open)return;try{const h=await call("get_history",{scenario:FC,market:g.market,limit:15});$("histb").innerHTML=`<table class="h"><tr><th>When</th><th>Who</th><th>Note</th><th>Cells</th><th>Net change</th></tr>${h.commits.map(c=>`<tr><td>${new Date(c.UpdatedAt).toLocaleString()}</td><td>${esc(c.UpdatedBy)}</td><td>${esc(c.Comment)}</td><td class="n">${fmt(c.CellCount)}</td><td class="n">${(c.NetChange>0?"+":"")+fmt(c.NetChange)}</td></tr>`).join("")}</table>`}catch(er){$("histb").textContent=errText(er)}};
+ for(const b of document.querySelectorAll("[data-act2]"))b.onclick=async()=>{const a=b.dataset.act2;if(S.edits.size)return say("Save or discard your changes first.",true);let n="";
+  if(a==="send_back"){n=await ask(`Send ${g.market} back`,"What needs to change?");if(n==null)return}
+  else if(a==="submit"){n=await ask(`Submit ${g.market} to FP&A`,"Anything FP&A should know? Required: say what you changed and why");if(n==null)return}
+  await doStatus(g.market,a,n)}}
+function inSel(r,c){if(!S.anc)return false;const a=S.anc,b=S.act;return r>=Math.min(a.r,b.r)&&r<=Math.max(a.r,b.r)&&c>=Math.min(a.c,b.c)&&c<=Math.max(a.c,b.c)}
+function renderGrid(){const g=G(),t=$("grid");if(!g||!t)return;const I=g.items.length,P=g.periods.length;
+ const cell=(r,c,v,cv,cls)=>{const hi=cv&&v!=null&&Math.abs(v-cv)/Math.abs(cv)>GAP/100,a=S.act.r===r&&S.act.c===c;return`<td class="c ${cls}${inSel(r,c)?" sl":""}${a?" ac":""}" data-r="${r}" data-c="${c}">${fmt(v)}<span class="cmp${hi?" hi":""}">${cv==null?"":fmt(cv)}</span></td>`};
+ let h=`<thead><tr><th class="it">Product</th>${g.periods.map(p=>`<th>${mon(p)}</th>`).join("")}<th class="tc">Total</th><th>vs ${esc(S.cmp)}</th></tr></thead><tbody>`;
+ h+=g.items.map((it,r)=>{const rt=rowTot(it),ct=g.periods.reduce((a,p)=>a+(cmpV(it,p)||0),0),i=itemInfo(it),prev=r?itemInfo(g.items[r-1]).prod:null;
+  return`<tr><td class="it${prev===i.prod?" cont":""}"><span class="pn">${esc(i.prod)}</span><span class="ps">${esc(i.size)}</span></td>${g.periods.map((p,c)=>{const k=K(it,p);return cell(r,c,val(it,p),cmpV(it,p),(locked(p)?"lk ":"")+(S.edits.has(k)?"dt ":"")+(S.conflicts.has(k)?"cf":""))}).join("")}${cell(r,P,rt,ct,"tc"+(g.readOnly?" lk":""))}<td>${ct?fp(pct(rt,ct)):""}</td></tr>`}).join("");
+ const gt=g.items.reduce((a,it)=>a+rowTot(it),0),gc=g.items.reduce((a,it)=>a+g.periods.reduce((b,p)=>b+(cmpV(it,p)||0),0),0);
+ h+=`<tr class="tot"><td class="it">Total</td>${g.periods.map((p,c)=>cell(I,c,colTot(p),g.items.reduce((a,it)=>a+(cmpV(it,p)||0),0),locked(p)?"lk":"")).join("")}${cell(I,P,gt,gc,"tc"+(g.readOnly?" lk":""))}<td>${gc?fp(pct(gt,gc)):""}</td></tr></tbody>`;
+ t.innerHTML=h;const n=S.edits.size;$("save").textContent=n?`Save ${n} change${n>1?"s":""}`:"Save";$("save").disabled=!n||S.busy;$("discard").disabled=!n;$("undo").disabled=!S.undo.length;$("cmpS").disabled=!!n;drawChart()}
+function drawChart(){const s=$("chart");if(!s||!G())return;const g=G(),W=s.clientWidth,H=s.clientHeight;if(!W)return;
+ const a=g.periods.map(colTot),b=g.periods.map(p=>g.items.reduce((x,it)=>x+(cmpV(it,p)||0),0));const mx=Math.max(1,...a,...b)*1.1,P=g.periods.length;
+ const X=i=>40+i*(W-60)/(P-1),Y=v=>H-24-(v/mx)*(H-46),line=(arr)=>arr.map((v,i)=>(i?"L":"M")+X(i).toFixed(1)+","+Y(v).toFixed(1)).join("");
+ s.innerHTML=`<g font-size="11" fill="currentColor" opacity=".6">${g.periods.map((p,i)=>W>520||i%2==0?`<text x="${X(i)}" y="${H-6}" text-anchor="middle">${MON[i]}</text>`:"").join("")}<text x="0" y="12">${fmt(mx/1.1)}</text></g>
+ <path d="${line(b)}" fill="none" stroke="var(--slate)" stroke-width="2" stroke-dasharray="5 4"/><path d="${line(a)}" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
+ <g font-size="12"><line x1="90" x2="112" y1="9" y2="9" stroke="var(--ink)" stroke-width="2.5"/><text x="118" y="13" fill="var(--ink)">Forecast</text><line x1="190" x2="212" y1="9" y2="9" stroke="var(--slate)" stroke-width="2" stroke-dasharray="5 4"/><text x="218" y="13" fill="var(--slate)">${esc(S.cmp)}</text></g>`}
+const ro=new ResizeObserver(()=>drawChart());ro.observe(document.body);
+function setMany(pairs){const prev=[];for(const[k,v]of pairs){prev.push([k,S.edits.has(k)?S.edits.get(k):undefined]);const orig=G().cells[k]??null;const nv=v==null?null:Math.round(v*100)/100;if((orig??0)===(nv??0)&&(orig==null)===(nv==null))S.edits.delete(k);else S.edits.set(k,nv)}if(prev.length){S.undo.push(prev);renderGrid()}}
+function spread(keys,target){const free=keys.filter(([it,p])=>!locked(p));if(!free.length)return[];
+ const fixed=keys.filter(([it,p])=>locked(p)).reduce((a,[it,p])=>a+(val(it,p)||0),0),tgt=Math.max(0,Math.round(target-fixed));
+ const cur=free.map(([it,p])=>Math.max(0,val(it,p)||0)),sum=cur.reduce((a,b)=>a+b,0);
+ const raw=cur.map(v=>sum>0?tgt*v/sum:tgt/free.length),fl=raw.map(Math.floor);let rem=tgt-fl.reduce((a,b)=>a+b,0);
+ raw.map((v,i)=>[v-fl[i],i]).sort((a,b)=>b[0]-a[0]).forEach(([_,i])=>{if(rem>0){fl[i]++;rem--}});return free.map(([it,p],i)=>[K(it,p),fl[i]])}
+function parse(s,cur){s=String(s).trim().replace(/,/g,"");if(s==="")return{v:null};let m;
+ if(m=s.match(/^([+-]\d*\.?\d+)%$/))return{v:(cur||0)*(1+ +m[1]/100)};if(m=s.match(/^\*\s*(\d*\.?\d+)$/))return{v:(cur||0)* +m[1]};
+ if(m=s.match(/^([+-]\d*\.?\d+)$/))return{v:(cur||0)+ +m[1]};if(/^\d*\.?\d+$/.test(s))return{v:+s};return{bad:true}}
+function applyInput(r,c,s){const g=G(),I=g.items.length,P=g.periods.length;if(g.readOnly)return say(g.readOnlyReason||"Read only.",true);
+ if(r<I&&c<P){if(locked(g.periods[c]))return say("That month is closed.",true);const x=parse(s,val(g.items[r],g.periods[c]));if(x.bad)return say("Could not read “"+s+"”.",true);if(x.v!=null&&x.v<0)return say("Values cannot be negative.",true);setMany([[K(g.items[r],g.periods[c]),x.v]]);return}
+ const keys=r<I?g.periods.map(p=>[g.items[r],p]):c<P?g.items.map(it=>[it,g.periods[c]]):g.items.flatMap(it=>g.periods.map(p=>[it,p]));
+ const cur=keys.reduce((a,[it,p])=>a+(val(it,p)||0),0),x=parse(s,cur);if(x.bad||x.v==null)return say("Could not read “"+s+"”.",true);
+ const pairs=spread(keys,x.v);if(!pairs.length)return say("Nothing editable there.",true);setMany(pairs);say("Spread "+fmt(x.v)+" across "+pairs.length+" cells in proportion to current values.")}
+function startEdit(init){const g=G(),grid=$("grid");if(!g||S.busy)return;const td=grid.querySelector(`td[data-r="${S.act.r}"][data-c="${S.act.c}"]`);if(!td||td.classList.contains("lk"))return;
+ S.editing=true;const inp=document.createElement("input");inp.className="ed";inp.inputMode="decimal";inp.setAttribute("aria-label","Cell value");
+ const I=g.items.length,P=g.periods.length,r=S.act.r,c=S.act.c;inp.value=init??(r<I&&c<P?(val(g.items[r],g.periods[c])??""):Math.round(r<I?rowTot(g.items[r]):c<P?colTot(g.periods[c]):0));
+ td.appendChild(inp);inp.focus();if(init==null)inp.select();let done=false;
+ const fin=(ok,dr,dc)=>{if(done)return;done=true;S.editing=false;if(ok)applyInput(r,c,inp.value);move(dr||0,dc||0);renderGrid();grid.focus()};
+ inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();fin(true,e.shiftKey?-1:1,0)}else if(e.key==="Tab"){e.preventDefault();fin(true,0,e.shiftKey?-1:1)}else if(e.key==="Escape"){e.preventDefault();fin(false)}e.stopPropagation()});inp.addEventListener("blur",()=>fin(true))}
+function move(dr,dc,ext){const g=G();if(ext&&!S.anc)S.anc={...S.act};if(!ext)S.anc=null;S.act={r:Math.max(0,Math.min(g.items.length,S.act.r+dr)),c:Math.max(0,Math.min(g.periods.length,S.act.c+dc))}}
+function selCells(){const g=G(),a=S.anc||S.act,b=S.act,out=[];for(let r=Math.min(a.r,b.r);r<=Math.max(a.r,b.r);r++)for(let c=Math.min(a.c,b.c);c<=Math.max(a.c,b.c);c++)if(r<g.items.length&&c<g.periods.length&&!locked(g.periods[c]))out.push([g.items[r],g.periods[c]]);return out}
+function applySel(){const s=$("pct").value.trim();if(G().readOnly)return say(G().readOnlyReason,true);const k=selCells();if(!k.length)return say("Select editable cells first.",true);
+ const t=/^[+-]?\d*\.?\d+$/.test(s)?(s.match(/^[+-]/)?s:"+"+s)+"%":s;const pairs=[];for(const[it,p]of k){const x=parse(t,val(it,p));if(x.bad)return say("Use a change like +5% or *0.95.",true);pairs.push([K(it,p),x.v])}setMany(pairs);say(`Adjusted ${pairs.length} cells by ${t}.`)}
+function doUndo(){const last=S.undo.pop();if(!last)return;for(const[k,v]of last.reverse()){if(v===undefined)S.edits.delete(k);else S.edits.set(k,v)}renderGrid()}
+document.addEventListener("mousedown",e=>{const td=e.target.closest("#grid td.c");if(!td||S.editing)return;const r=+td.dataset.r,c=+td.dataset.c;if(e.shiftKey){if(!S.anc)S.anc={...S.act}}else S.anc=null;S.act={r,c};renderGrid();$("grid").focus()});
+document.addEventListener("dblclick",e=>{if(e.target.closest("#grid td.c"))startEdit()});
+document.addEventListener("keydown",e=>{if(S.view!=="market"||S.editing||document.activeElement!==$("grid"))return;const map={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
+ if(map[e.key]){e.preventDefault();move(...map[e.key],e.shiftKey);renderGrid()}else if(e.key==="Enter"||e.key==="F2"){e.preventDefault();startEdit()}
+ else if(e.key==="Tab"){e.preventDefault();move(0,e.shiftKey?-1:1);renderGrid()}else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){e.preventDefault();doUndo()}
+ else if(e.key==="Delete"||e.key==="Backspace"){e.preventDefault();if(!G().readOnly){const k=selCells();if(k.length)setMany(k.map(([it,p])=>[K(it,p),null]))}}
+ else if(e.key.length===1&&/[0-9.+\-*]/.test(e.key)&&!e.ctrlKey&&!e.metaKey){e.preventDefault();startEdit(e.key)}});
+document.addEventListener("paste",e=>{if(S.view!=="market"||S.editing||document.activeElement!==$("grid")||G().readOnly)return;e.preventDefault();const g=G(),txt=(e.clipboardData||window.clipboardData).getData("text");
+ const rows=txt.replace(/\r/g,"").split("\n").filter((l,i,a)=>l!==""||i<a.length-1).map(l=>l.split("\t"));const pairs=[];let skipped=0;
+ rows.forEach((row,i)=>row.forEach((s,j)=>{const r=S.act.r+i,c=S.act.c+j;if(r>=g.items.length||c>=g.periods.length||locked(g.periods[c])){skipped++;return}const x=parse(s,null);if(x.bad||(x.v!=null&&x.v<0)){skipped++;return}pairs.push([K(g.items[r],g.periods[c]),x.v])}));
+ setMany(pairs);say(`Pasted ${pairs.length} cells`+(skipped?`, skipped ${skipped} outside the grid, closed or not numeric.`:"."))});
+async function save(){if(!S.edits.size||S.busy)return;const g=G();const changes=[...S.edits].map(([k,v])=>{const[item,period]=k.split("|");return{market:g.market,item,period:+period,value:v,expected:g.cells[k]??null}});
+ S.busy=true;$("save").disabled=true;say("Saving");
+ try{const r=await call("save_cells",{scenario:FC,changes,comment:$("note").value.trim(),user_id:S.me});
+  if(r.locked&&r.locked.length)say("Nothing saved. "+r.locked[0].reason+".",true);
+  else if(r.conflicts&&r.conflicts.length){S.conflicts=new Map(r.conflicts.map(c=>[K(c.item,c.period),c.current]));say(`Nothing saved. ${r.conflicts.length} cell${r.conflicts.length>1?"s were":" was"} changed by someone else (outlined red). Reload the market to see their numbers.`,true)}
+  else{for(const[k,v]of S.edits)g.cells[k]=v;S.edits.clear();S.undo=[];S.conflicts.clear();$("note").value="";say(`Saved ${r.saved} cells by ${r.updatedBy}. Net change ${(r.netChange>0?"+":"")+fmt(r.netChange)} cases.`);loadBoard()}}
+ catch(e){say(errText(e,true),true)}S.busy=false;renderGrid()}
+async function addNote(){const t=$("cmt").value.trim();if(!t)return;try{const r=await call("add_comment",{scenario:FC,market:S.market,text:t,user_id:S.me});if(!r.ok)return say(r.error,true);await loadMarket(S.market,true);say("Note added.")}catch(e){say(errText(e,true),true)}}
+
+/* ---------- routing and boot ---------- */
+function route(){if(S.edits.size&&!location.hash.startsWith("#market-"+String(S.market||"").toLowerCase())){if(!confirmLeave())return}
+ const h=location.hash.slice(1)||"cycle";const m=h.match(/^market-([a-z]{2})$/);
+ if(m){const was=S.view;S.view="market";const mk=m[1].toUpperCase();renderTop();if(was!=="market"||S.market!==mk||!S.grid||S.grid.market!==mk)loadMarket(mk,S.market===mk&&S.edits.size>0);else viewMarket();return}
+ S.view=["review","cfo","cycle"].includes(h)?h:(h==="market"&&S.market?(location.hash="market-"+S.market.toLowerCase(),"market"):"cycle");renderTop();
+ if(!S.board)return;if(S.view==="review")viewReview();else if(S.view==="cfo")viewCfo();else viewCycle()}
+function confirmLeave(){say("You have unsaved changes in "+S.market+". Save or discard them before leaving the market.",true);history.replaceState(null,"","#market-"+S.market.toLowerCase());return false}
+addEventListener("hashchange",route);
+addEventListener("beforeunload",e=>{if(S.edits.size){e.preventDefault();e.returnValue=""}});
+async function loadBoard(){S.board=await call("get_board",{scenario:FC,compare:AG});renderTop()}
+$("me").onchange=e=>{S.me=+e.target.value;try{localStorage.setItem("pg.me",S.me)}catch(_){}S.filter.scope=role()==="Planner"?"mine":"all";say(`Working as ${meU().name}, ${meU().role}.`);if(S.view==="market"&&S.market)loadMarket(S.market,true);else route()};
+async function boot(){let t=0;while(!window.claude&&t++<30)await new Promise(r=>setTimeout(r,100));
+ const m=window.claude?await window.claude.use("mcp").catch(()=>null):null;
+ if(!m){$("conn").textContent="Not connected";$("view").innerHTML=`<div class="empty">Open this page in Claude with the PlanGrid connector added.</div>`;return}
+ S.mcp=m;
+ try{S.opts=await call("list_options",{});await loadBoard()}catch(e){$("conn").textContent="Not connected";$("view").innerHTML=`<div class="empty">${esc(errText(e))}</div>`;return}
+ $("conn").innerHTML=`<span style="color:var(--green)">●</span> Live`;
+ let saved=null;try{saved=+localStorage.getItem("pg.me")}catch(_){}
+ let guess=null;try{const u=await window.claude.use("user");const id=u&&await u.me();if(id){const ps=await u.profiles([id]);const nm=(ps&&ps[id]&&ps[id].name)||"";guess=S.opts.users.find(x=>x.name.toLowerCase()===nm.toLowerCase())}}catch(_){}
+ S.me=(S.opts.users.find(u=>u.user_id===saved)||guess||S.opts.users.find(u=>u.role==="Admin")||S.opts.users[0]).user_id;
+ const grp=["Planner","FP&A","CFO","Admin"];$("me").innerHTML=grp.map(r=>`<optgroup label="${esc(r)}">${S.opts.users.filter(u=>u.role===r).map(u=>`<option value="${u.user_id}">${esc(u.name)}${r==="Planner"?" ("+esc(u.markets.split(",").length)+" markets)":""}</option>`).join("")}</optgroup>`).join("");
+ $("me").value=S.me;S.filter.scope=role()==="Planner"?"mine":"all";route()}
+boot();
+}
+</script></body></html>
